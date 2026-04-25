@@ -325,6 +325,7 @@ small {
 }
 
 .search-strip,
+.article-detail,
 .category-section,
 .tools-section,
 .bot-section,
@@ -332,6 +333,158 @@ small {
 .stories-section,
 .newsletter-section {
   padding: clamp(64px, 9vw, 118px) clamp(18px, 5vw, 72px);
+}
+
+.article-mode .hero,
+.article-mode .category-section,
+.article-mode .tools-section,
+.article-mode .bot-section,
+.article-mode .articles-section,
+.article-mode .stories-section {
+  display: none;
+}
+
+.article-mode .search-strip {
+  margin-top: 0;
+}
+
+.article-detail {
+  background: var(--bg);
+}
+
+.article-hero {
+  background:
+    linear-gradient(135deg, rgba(7, 19, 15, 0.96), rgba(8, 122, 75, 0.86)),
+    url("/assets/moneynova-hero.svg");
+  background-position: center;
+  background-size: cover;
+  border-radius: 0 0 28px 28px;
+  color: #fff;
+  padding: clamp(74px, 10vw, 126px) clamp(18px, 5vw, 72px);
+}
+
+.article-hero .back-link {
+  color: var(--money);
+  display: inline-block;
+  font-weight: 900;
+  margin-bottom: 28px;
+}
+
+.article-hero span {
+  color: var(--money);
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.article-hero h1 {
+  max-width: 980px;
+}
+
+.article-hero p {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1.12rem;
+  line-height: 1.75;
+  max-width: 760px;
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.article-meta span,
+.article-meta strong {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 9px 12px;
+}
+
+.article-body-layout {
+  align-items: start;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 230px minmax(0, 760px) 260px;
+  padding: clamp(42px, 7vw, 82px) clamp(18px, 5vw, 72px);
+}
+
+.article-toc,
+.related-box {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  position: sticky;
+  top: 88px;
+}
+
+.article-toc a,
+.related-box a {
+  color: var(--blue);
+  font-weight: 780;
+  line-height: 1.45;
+}
+
+.article-body {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: clamp(24px, 4vw, 46px);
+}
+
+.article-body section + section {
+  border-top: 1px solid var(--line);
+  margin-top: 34px;
+  padding-top: 34px;
+}
+
+.article-body h2 {
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+}
+
+.article-body p,
+.article-body li {
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.article-body li + li {
+  margin-top: 8px;
+}
+
+.article-ad {
+  margin-bottom: 34px;
+  min-height: 120px;
+}
+
+.article-warning {
+  background: var(--blue-soft);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.article-faq details {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.article-faq details + details {
+  margin-top: 10px;
+}
+
+.article-faq summary {
+  cursor: pointer;
+  font-weight: 900;
 }
 
 .search-strip {
@@ -683,6 +836,7 @@ select {
   .bot-section,
   .content-layout,
   .tool-layout,
+  .article-body-layout,
   .site-footer {
     grid-template-columns: 1fr;
   }
@@ -696,6 +850,11 @@ select {
   .sidebar {
     position: static;
   }
+
+  .article-toc,
+  .related-box {
+    position: static;
+  }
 }
 
 @media (max-width: 680px) {
@@ -705,6 +864,7 @@ select {
 
   .hero,
   .search-strip,
+  .article-detail,
   .category-section,
   .tools-section,
   .bot-section,

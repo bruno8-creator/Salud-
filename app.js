@@ -13,6 +13,8 @@ const newsletterForm = document.querySelector("#newsletterForm");
 
 let content = { categories: [], articles: [], tools: [] };
 let activeTool = "compound";
+const articleDetail = document.querySelector("#articleDetail");
+const articlePath = window.location.pathname;
 
 init();
 
@@ -21,11 +23,83 @@ async function init() {
   setupReveal();
   setupForms();
   content = await getJson("/api/content", fallbackContent());
+  renderArticlePageIfNeeded(content.articles);
   renderCategories(content.categories);
   renderArticles(content.articles);
   renderTrending(content.trending || content.articles.slice(0, 6));
   renderToolTabs(content.tools);
   renderCalculator(activeTool);
+}
+
+function renderArticlePageIfNeeded(articles) {
+  const article = articles.find((item) => item.slug === articlePath);
+  if (!article) return;
+
+  document.body.classList.add("article-mode");
+  articleDetail.hidden = false;
+  articleDetail.innerHTML = `
+    <div class="article-hero reveal is-visible">
+      <a class="back-link" href="/#articles">Back to all articles</a>
+      <span>${article.category}</span>
+      <h1>${article.title}</h1>
+      <p>${article.excerpt}</p>
+      <div class="article-meta">
+        <strong>MoneyNova Editorial</strong>
+        <span>${article.readTime}</span>
+        <span>Updated 2026</span>
+      </div>
+    </div>
+
+    <div class="article-body-layout">
+      <aside class="article-toc">
+        <strong>In this guide</strong>
+        <a href="#quick-takeaways">Quick takeaways</a>
+        ${article.sections.map((section, index) => `<a href="#section-${index + 1}">${section.heading}</a>`).join("")}
+        <a href="#article-faq">FAQ</a>
+      </aside>
+
+      <div class="article-body">
+        <div class="ad-slot article-ad">AdSense placement</div>
+        <section id="quick-takeaways">
+          <h2>Quick takeaways</h2>
+          <ul>
+            ${article.takeaways.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+        </section>
+        ${article.sections.map((section, index) => `
+          <section id="section-${index + 1}">
+            <h2>${section.heading}</h2>
+            ${section.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
+            <ul>
+              ${section.points.map((point) => `<li>${point}</li>`).join("")}
+            </ul>
+          </section>
+        `).join("")}
+        <section class="article-warning">
+          <h2>Important note</h2>
+          <p>${article.disclaimer}</p>
+        </section>
+        <section id="article-faq" class="article-faq">
+          <h2>FAQ</h2>
+          ${article.faq.map((item) => `
+            <details>
+              <summary>${item.question}</summary>
+              <p>${item.answer}</p>
+            </details>
+          `).join("")}
+        </section>
+      </div>
+
+      <aside class="related-box">
+        <h3>Related articles</h3>
+        ${articles
+          .filter((item) => item.slug !== article.slug)
+          .slice(0, 5)
+          .map((item) => `<a href="${item.slug}">${item.title}</a>`)
+          .join("")}
+      </aside>
+    </div>
+  `;
 }
 
 function setupTheme() {

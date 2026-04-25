@@ -130,7 +130,7 @@ const extraArticleIdeas = [
   imageLabel: "Guide"
 }));
 
-const articles = [...featuredArticles, ...extraArticleIdeas];
+const articles = [...featuredArticles, ...extraArticleIdeas].map(buildArticle);
 const trending = featuredArticles.slice(0, 6);
 
 const tools = [
@@ -329,6 +329,145 @@ function getArticleMeta(requestPath) {
   const article = articles.find((item) => item.slug === requestPath);
   if (!article) return null;
   return [`${article.title} | MoneyNova`, article.excerpt];
+}
+
+function buildArticle(article) {
+  const angle = getArticleAngle(article.title, article.category);
+  return {
+    ...article,
+    readTime: article.id <= 12 ? "7 min read" : "5 min read",
+    takeaways: [
+      angle.takeaway,
+      "Pick one clear goal before choosing a tactic, tool or opportunity.",
+      "Avoid anything that promises guaranteed returns, instant wealth or zero effort.",
+      "Track your numbers weekly so you can improve decisions with evidence."
+    ],
+    sections: [
+      {
+        heading: "What this opportunity really means",
+        paragraphs: [
+          `${article.title} is not about chasing a viral trick. The goal is to understand the money mechanics behind the idea: where the cash comes from, what skill or asset creates value, and what risks can stop progress.`,
+          "MoneyNova articles are written for practical readers. That means simple steps, realistic expectations and a bias toward actions that can be repeated over time."
+        ],
+        points: [
+          "Define the outcome: extra income, lower expenses, better investing knowledge or a stronger financial habit.",
+          "Separate beginner-friendly steps from advanced tactics that need capital, experience or legal advice.",
+          "Use small tests before committing serious time or money."
+        ]
+      },
+      {
+        heading: "Step-by-step plan",
+        paragraphs: [
+          "Start with a narrow version of the idea. A narrow plan is easier to execute, easier to measure and less overwhelming than trying to do everything at once.",
+          angle.plan
+        ],
+        points: [
+          "Choose one path and give it a 14-day test.",
+          "Write down your starting budget, expected upside and biggest risk.",
+          "Create a simple weekly review: what worked, what wasted time and what should change.",
+          "Double down only when the numbers or feedback prove there is demand."
+        ]
+      },
+      {
+        heading: "Common mistakes to avoid",
+        paragraphs: [
+          "Most people fail because they confuse information with execution. Reading ten guides feels productive, but one focused experiment usually teaches more.",
+          "The second mistake is ignoring downside. Every money decision has tradeoffs: time, risk, taxes, fees, energy or opportunity cost."
+        ],
+        points: [
+          "Do not pay for expensive courses before validating the basic idea yourself.",
+          "Do not borrow money for a strategy you do not understand.",
+          "Do not compare your first month to someone else's highlight reel.",
+          "Do not ignore taxes, platform fees, refunds or maintenance costs."
+        ]
+      },
+      {
+        heading: "Tools and metrics to track",
+        paragraphs: [
+          "A good money system is measurable. Whether the goal is earning, saving or investing, you need a few numbers that tell the truth quickly.",
+          "Use the calculators on MoneyNova to turn vague goals into monthly targets, profit estimates and long-term projections."
+        ],
+        points: [
+          "Track income, costs, profit and hours if this is an earning idea.",
+          "Track savings rate, spending categories and goal progress if this is a personal finance habit.",
+          "Track risk, diversification, volatility and time horizon if this relates to investing.",
+          "Keep a short decision journal so you remember why you made each move."
+        ]
+      },
+      {
+        heading: "Next best move",
+        paragraphs: [
+          angle.next,
+          "If you are unsure, start smaller. A small win builds confidence, creates proof and gives you better information for the next decision."
+        ],
+        points: [
+          "Pick one action you can finish today.",
+          "Set a reminder to review results in one week.",
+          "Save useful links, costs and numbers in one place.",
+          "Read a related MoneyNova guide before scaling the idea."
+        ]
+      }
+    ],
+    faq: [
+      {
+        question: `Is ${article.title.toLowerCase()} realistic for beginners?`,
+        answer: "Yes, if you start with a small version, keep costs low and focus on repeatable actions instead of shortcuts."
+      },
+      {
+        question: "How fast can I see results?",
+        answer: "Some tactics can show early feedback in days, but meaningful financial progress usually takes weeks or months of consistent effort."
+      },
+      {
+        question: "What is the biggest risk?",
+        answer: "The biggest risk is usually spending too much time or money before validating that the idea works for your situation."
+      }
+    ],
+    disclaimer: article.category === "Investing"
+      ? "This article is educational only and is not financial advice. Investing involves risk, including possible loss of capital. Consider speaking with a licensed professional."
+      : "This article is educational only. Money results vary by skills, market conditions, effort, location and personal situation."
+  };
+}
+
+function getArticleAngle(title, category) {
+  const lower = title.toLowerCase();
+
+  if (lower.includes("ai")) {
+    return {
+      takeaway: "AI can help you move faster, but the money comes from solving a real problem for someone.",
+      plan: "List three repetitive tasks people already pay for, then use AI to make one of them faster, cheaper or easier to deliver.",
+      next: "Choose one AI-assisted service or digital product, create a simple example and show it to five potential buyers."
+    };
+  }
+
+  if (lower.includes("invest") || category === "Investing") {
+    return {
+      takeaway: "Investing should start with risk, time horizon and diversification, not hype.",
+      plan: "Learn the difference between individual stocks, broad ETFs, cash savings and speculative assets before putting money at risk.",
+      next: "Write your time horizon, risk tolerance and monthly contribution amount before comparing investment options."
+    };
+  }
+
+  if (lower.includes("save") || lower.includes("budget") || category === "Saving") {
+    return {
+      takeaway: "Saving more is easiest when you automate the good decision and remove the repeated bad one.",
+      plan: "Audit the last 30 days of spending, find three leaks, then automate a transfer the day income arrives.",
+      next: "Use the budget calculator and savings goal calculator to turn the article into a monthly target."
+    };
+  }
+
+  if (lower.includes("side hustle") || lower.includes("freelance") || lower.includes("jobs")) {
+    return {
+      takeaway: "The best side hustle is one you can test quickly and repeat without burning out.",
+      plan: "Match one skill, one audience and one simple offer. Then contact real people instead of waiting for perfect branding.",
+      next: "Create a one-page offer, price it simply and send it to ten people or businesses this week."
+    };
+  }
+
+  return {
+    takeaway: "Money progress comes from repeatable actions, not one-time motivation.",
+    plan: "Turn the idea into a small checklist: what to learn, what to test, what to measure and when to stop or continue.",
+    next: "Pick the smallest useful action and complete it before reading another guide."
+  };
 }
 
 function buildSitemap() {
