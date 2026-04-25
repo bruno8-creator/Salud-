@@ -1,209 +1,262 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fitzerd | Plataforma fitness inteligente</title>
-    <meta
-      name="description"
-      content="Fitzerd es una plataforma profesional de ejercicios de gym, artículos fitness y rutinas generadas por un agente personalizado."
-    />
+    <title>{{META_TITLE}}</title>
+    <meta name="description" content="{{META_DESCRIPTION}}" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:title" content="{{META_TITLE}}" />
+    <meta property="og:description" content="{{META_DESCRIPTION}}" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#07130f" />
+    <link rel="canonical" href="{{CANONICAL_URL}}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "MoneyNova",
+        "url": "{{CANONICAL_URL}}",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "{{CANONICAL_URL}}?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Can MoneyNova tell me if a stock is risky?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "MoneyNova's analyzer reviews recent market data such as trend, volatility and drawdown to create an educational risk snapshot. It is not financial advice."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does MoneyNova provide financial advice?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. MoneyNova is educational content and tooling only. Always do your own research and consider a licensed financial advisor."
+            }
+          }
+        ]
+      }
+    </script>
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="cursor-glow" aria-hidden="true"></div>
-
     <header class="site-header">
-      <a class="brand" href="#inicio" aria-label="Fitzerd inicio">
-        <img src="assets/fitzerd-logo.svg" alt="" />
-        <span>Fitzerd</span>
+      <a class="brand" href="/" aria-label="MoneyNova home">
+        <img src="/assets/moneynova-logo.svg" alt="" />
+        <span>MoneyNova</span>
       </a>
-      <nav class="nav-links" aria-label="Principal">
-        <a href="#ejercicios">Ejercicios</a>
-        <a href="#articulos">Artículos</a>
-        <a href="#rutina">Agente</a>
-        <a href="#progreso">Progreso</a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#make-money">Make Money</a>
+        <a href="#tools">Tools</a>
+        <a href="#stock-bot">Stock Bot</a>
+        <a href="#articles">Blog</a>
       </nav>
-      <a class="nav-action magnetic" href="#rutina">Crear rutina</a>
+      <div class="header-actions">
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
+        <a class="nav-action" href="#newsletter">Join free</a>
+      </div>
     </header>
 
     <main>
-      <section class="hero" id="inicio" aria-label="Inicio">
-        <img src="assets/hero-fitness.png" alt="Entrenamiento de fuerza en un gimnasio moderno" />
-        <div class="hero-overlay"></div>
-        <div class="hero-orbit" aria-hidden="true"></div>
+      <section class="hero" id="home">
         <div class="hero-content reveal">
-          <p class="eyebrow">Fitness inteligente</p>
-          <h1>Fitzerd convierte tus objetivos en entrenamientos reales.</h1>
+          <p class="eyebrow">Money guides, tools and market signals</p>
+          <h1>Make More Money. Build Your Future.</h1>
           <p class="hero-copy">
-            Ejercicios, artículos y un agente fitness que diseña rutinas por nivel, material,
-            días disponibles y objetivo. Profesional, claro y listo para crecer.
+            Discover proven ways to earn money online, side hustles, investing basics, saving
+            strategies and financial tools designed for young adults, students and builders.
           </p>
           <div class="hero-actions">
-            <a class="primary-button magnetic" href="#rutina">Generar rutina</a>
-            <a class="ghost-button magnetic" href="#ejercicios">Explorar ejercicios</a>
+            <a class="primary-button" href="#articles">Start Learning</a>
+            <a class="ghost-button" href="#tools">Explore Tools</a>
+          </div>
+          <div class="trust-row" aria-label="MoneyNova highlights">
+            <span>Evergreen SEO content</span>
+            <span>AdSense-ready layout</span>
+            <span>Affiliate-friendly sections</span>
           </div>
         </div>
-      </section>
 
-      <section class="metrics-band" aria-label="Resumen">
-        <div class="reveal">
-          <strong data-count="54">0</strong>
-          <span>ejercicios guiados</span>
-        </div>
-        <div class="reveal">
-          <strong data-count="12">0</strong>
-          <span>artículos fitness</span>
-        </div>
-        <div class="reveal">
-          <strong data-count="7">0</strong>
-          <span>días planificados</span>
-        </div>
-        <div class="reveal">
-          <strong data-count="100">0</strong>
-          <span>% personalizable</span>
-        </div>
-      </section>
-
-      <section class="section-shell" id="ejercicios">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Biblioteca</p>
-          <h2>Ejercicios por músculo, objetivo y material.</h2>
-          <p>
-            Fitzerd organiza movimientos clave para que el usuario entienda qué entrenar, cómo
-            ejecutarlo y cuándo incluirlo en su rutina.
-          </p>
-        </div>
-
-        <div class="exercise-grid" id="exerciseGrid" aria-live="polite"></div>
-      </section>
-
-      <section class="articles-section" id="articulos">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Contenido</p>
-          <h2>Artículos para entrenar con criterio.</h2>
-          <p>
-            Guías breves sobre técnica, nutrición, descanso y progresión. Pensadas para que la
-            plataforma no sea solo bonita, sino útil.
-          </p>
-        </div>
-
-        <div class="article-grid" id="articleGrid" aria-live="polite"></div>
-      </section>
-
-      <section class="agent-section" id="rutina">
-        <div class="agent-panel reveal">
-          <div class="section-heading compact">
-            <p class="eyebrow">Agente personalizado</p>
-            <h2>Fitzerd Coach genera tu rutina.</h2>
-            <p>
-              El frontend habla con el backend para generar una propuesta semanal. Después podremos
-              conectar este mismo flujo a OpenAI para que sea un agente real con memoria y perfil.
-            </p>
+        <aside class="hero-dashboard reveal" aria-label="Financial dashboard preview">
+          <div class="dashboard-top">
+            <span>Income map</span>
+            <strong>+42%</strong>
           </div>
-
-          <form class="routine-form" id="routineForm">
-            <label>
-              Objetivo
-              <select id="goal">
-                <option value="muscle">Ganar músculo</option>
-                <option value="strength">Fuerza</option>
-                <option value="fatloss">Perder grasa</option>
-                <option value="health">Salud general</option>
-              </select>
-            </label>
-
-            <label>
-              Nivel
-              <select id="level">
-                <option value="beginner">Principiante</option>
-                <option value="intermediate">Intermedio</option>
-                <option value="advanced">Avanzado</option>
-              </select>
-            </label>
-
-            <label>
-              Días por semana
-              <input id="days" type="range" min="2" max="6" value="4" />
-              <output id="daysOutput">4 días</output>
-            </label>
-
-            <label>
-              Material
-              <select id="equipment">
-                <option value="full">Gimnasio completo</option>
-                <option value="dumbbells">Mancuernas y banco</option>
-                <option value="bodyweight">Peso corporal</option>
-              </select>
-            </label>
-
-            <fieldset>
-              <legend>Enfoque extra</legend>
-              <label class="check-option">
-                <input type="checkbox" value="core" checked />
-                Core
-              </label>
-              <label class="check-option">
-                <input type="checkbox" value="mobility" />
-                Movilidad
-              </label>
-              <label class="check-option">
-                <input type="checkbox" value="cardio" checked />
-                Cardio
-              </label>
-            </fieldset>
-
-            <button class="primary-button full magnetic" type="submit">Generar plan</button>
-          </form>
-        </div>
-
-        <aside class="routine-output reveal" aria-live="polite">
-          <div class="agent-status">
-            <span class="pulse"></span>
-            <p>Fitzerd Coach conectado</p>
+          <div class="chart-card" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
           </div>
-          <div id="routineResult" class="result-empty">
-            <h3>Tu rutina aparecerá aquí.</h3>
-            <p>Completa el formulario y genera una semana de entrenamiento personalizada.</p>
+          <div class="mini-grid">
+            <div>
+              <small>Side hustle</small>
+              <strong>€1,280</strong>
+            </div>
+            <div>
+              <small>Savings goal</small>
+              <strong>68%</strong>
+            </div>
+          </div>
+          <div class="market-ticker">
+            <span>AI income ideas</span>
+            <span>Budget tools</span>
+            <span>Stock risk bot</span>
           </div>
         </aside>
       </section>
 
-      <section class="section-shell progress" id="progreso">
+      <section class="search-strip reveal">
+        <label for="siteSearch">Search MoneyNova</label>
+        <input id="siteSearch" type="search" placeholder="Search articles, tools, side hustles..." />
+        <span id="searchCount">50+ guides and tools</span>
+      </section>
+
+      <section class="category-section" id="make-money">
         <div class="section-heading reveal">
-          <p class="eyebrow">Sistema</p>
-          <h2>Una base lista para convertirse en producto.</h2>
+          <p class="eyebrow">Ways to make money</p>
+          <h2>Find realistic opportunities online and offline.</h2>
           <p>
-            Ya hay backend, APIs de contenido y generación de rutinas. La siguiente evolución es
-            login, perfiles, historial y un agente IA conectado a una API real.
+            A clean content structure built for organic traffic: categories, evergreen articles,
+            trending posts and related content paths.
           </p>
         </div>
-        <div class="progress-row">
-          <div class="reveal">
-            <span class="dot"></span>
-            <strong>Backend propio</strong>
-            <p>Servidor Node con endpoints para ejercicios, artículos y rutinas.</p>
+        <div class="category-grid" id="categoryGrid"></div>
+      </section>
+
+      <section class="tools-section" id="tools">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Useful money tools</p>
+          <h2>Calculators people actually search for.</h2>
+          <p>
+            Compound interest, savings goals, debt payoff, salary conversion, side hustle profit
+            and budget planning. Built to rank and keep users engaged.
+          </p>
+        </div>
+        <div class="tool-layout">
+          <div class="tool-tabs" id="toolTabs"></div>
+          <div class="calculator-panel reveal" id="calculatorPanel"></div>
+        </div>
+      </section>
+
+      <section class="bot-section" id="stock-bot">
+        <div class="bot-copy reveal">
+          <p class="eyebrow">Market risk bot</p>
+          <h2>Ask if a stock looks risky, balanced or strong.</h2>
+          <p>
+            Enter a ticker like AAPL, MSFT, TSLA or NVDA. The backend checks recent market data,
+            trend, volatility and drawdown, then returns an educational risk snapshot.
+          </p>
+          <p class="disclaimer">
+            Educational only. This is not financial advice, a buy/sell signal or a guarantee of
+            future performance.
+          </p>
+        </div>
+        <div class="bot-card reveal">
+          <form id="stockForm" class="stock-form">
+            <label for="stockSymbol">Company ticker</label>
+            <div class="stock-input-row">
+              <input id="stockSymbol" autocomplete="off" placeholder="AAPL" maxlength="12" />
+              <button class="primary-button" type="submit">Analyze</button>
+            </div>
+          </form>
+          <div id="stockResult" class="stock-result empty">
+            <strong>MoneyNova Bot is ready.</strong>
+            <p>Try AAPL, MSFT, TSLA, NVDA, AMZN or any listed ticker.</p>
           </div>
-          <div class="reveal">
-            <span class="dot"></span>
-            <strong>Contenido dinámico</strong>
-            <p>La web pinta ejercicios y artículos desde datos centralizados.</p>
-          </div>
-          <div class="reveal">
-            <span class="dot"></span>
-            <strong>Preparada para IA</strong>
-            <p>El flujo del agente ya está separado para conectar un modelo después.</p>
-          </div>
+        </div>
+      </section>
+
+      <section class="articles-section" id="articles">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Featured articles</p>
+          <h2>Evergreen posts ready for SEO growth.</h2>
+          <p>
+            The backend ships 50 article ideas, featured content, trending posts and SEO-friendly
+            routes such as /make-money-online and /compound-interest-calculator.
+          </p>
+        </div>
+        <div class="content-layout">
+          <div class="article-grid" id="articleGrid"></div>
+          <aside class="sidebar">
+            <div class="ad-slot">AdSense placement</div>
+            <div class="trend-card">
+              <h3>Trending</h3>
+              <ol id="trendingList"></ol>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="stories-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Success stories</p>
+          <h2>Simple stories that make money feel possible.</h2>
+        </div>
+        <div class="story-grid">
+          <article class="story-card reveal">
+            <span>Student</span>
+            <h3>Maya built a €600/month design side hustle.</h3>
+            <p>She used freelance marketplaces, a simple portfolio and weekly outreach.</p>
+          </article>
+          <article class="story-card reveal">
+            <span>Creator</span>
+            <h3>Leo turned AI workflows into templates.</h3>
+            <p>He packaged repeatable prompts and sold them as digital products.</p>
+          </article>
+          <article class="story-card reveal">
+            <span>Beginner investor</span>
+            <h3>Sofia automated her first €10,000 goal.</h3>
+            <p>She combined a budget calculator, savings targets and monthly ETFs research.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="newsletter-section" id="newsletter">
+        <div class="newsletter-card reveal">
+          <p class="eyebrow">Free newsletter</p>
+          <h2>Join 10,000+ people improving their finances.</h2>
+          <form id="newsletterForm">
+            <input type="email" placeholder="you@example.com" required />
+            <button class="primary-button" type="submit">Join free</button>
+          </form>
+          <small>No spam. Just practical money ideas, tools and weekly opportunities.</small>
         </div>
       </section>
     </main>
 
-    <script src="app.js"></script>
+    <footer class="site-footer">
+      <div>
+        <a class="brand footer-brand" href="/">
+          <img src="/assets/moneynova-logo.svg" alt="" />
+          <span>MoneyNova</span>
+        </a>
+        <p>Modern money education for earning, saving and investing smarter.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/disclaimer">Disclaimer</a>
+        <a href="/sitemap.xml">Sitemap</a>
+      </nav>
+    </footer>
+
+    <script src="/app.js"></script>
   </body>
 </html>

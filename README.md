@@ -1,23 +1,24 @@
-# Fitzerd
+# MoneyNova
 
-Plataforma fitness estética y profesional con ejercicios, artículos y un agente generador de rutinas.
+Professional money blog and tools platform focused on earning more, personal finance, investing basics and SEO-driven calculators.
 
-## Incluye
+## Features
 
-- Landing responsive con imagen hero propia.
-- Logo SVG profesional de Fitzerd.
-- Efectos visuales: reveal on scroll, contador animado, glow de cursor, hover premium y movimiento sutil del hero.
-- Backend Node sin dependencias externas.
-- APIs para ejercicios, artículos, contenido completo y generación de rutinas.
-- Agente `Fitzerd Coach` conectado al backend.
+- Premium responsive financial/startup design.
+- Dark mode, sticky navbar, smooth reveal animations and search.
+- SEO routes for evergreen topics and calculators.
+- 50+ article ideas, featured articles, trending posts and sitemap.
+- Money tools: compound interest, savings goal, debt repayment, salary, side hustle profit and budget calculators.
+- Market risk bot that checks recent market data for a ticker and returns an educational risk snapshot.
+- AdSense and affiliate-ready content layout.
 
-## Ejecutar
+## Run
 
 ```bash
 npm start
 ```
 
-Después abre:
+Open:
 
 ```text
 http://127.0.0.1:5173/
@@ -26,7 +27,11 @@ http://127.0.0.1:5173/
 ## Endpoints
 
 - `GET /api/health`
-- `GET /api/exercises`
-- `GET /api/articles`
 - `GET /api/content`
-- `POST /api/routines`
+- `GET /api/articles`
+- `GET /api/market-analysis?symbol=AAPL`
+- `GET /sitemap.xml`
+
+## Important
+
+MoneyNova is educational only. The market analyzer is not financial advice and does not recommend buying, selling or holding any investment.

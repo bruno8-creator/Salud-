@@ -1,200 +1,273 @@
-const form = document.querySelector("#routineForm");
-const daysInput = document.querySelector("#days");
-const daysOutput = document.querySelector("#daysOutput");
-const result = document.querySelector("#routineResult");
-const exerciseGrid = document.querySelector("#exerciseGrid");
+const categoryGrid = document.querySelector("#categoryGrid");
 const articleGrid = document.querySelector("#articleGrid");
-const cursorGlow = document.querySelector(".cursor-glow");
+const trendingList = document.querySelector("#trendingList");
+const siteSearch = document.querySelector("#siteSearch");
+const searchCount = document.querySelector("#searchCount");
+const toolTabs = document.querySelector("#toolTabs");
+const calculatorPanel = document.querySelector("#calculatorPanel");
+const stockForm = document.querySelector("#stockForm");
+const stockSymbol = document.querySelector("#stockSymbol");
+const stockResult = document.querySelector("#stockResult");
+const themeToggle = document.querySelector("#themeToggle");
+const newsletterForm = document.querySelector("#newsletterForm");
 
-const fallbackExercises = [
-  {
-    id: "bench-press",
-    category: "Fuerza",
-    name: "Press banca",
-    summary: "Básico de empuje para pecho, tríceps y hombro anterior.",
-    cues: ["Escápulas atrás", "Pies firmes", "Barra controlada"]
-  },
-  {
-    id: "squat",
-    category: "Pierna",
-    name: "Sentadilla",
-    summary: "Movimiento principal para pierna completa, core y estabilidad.",
-    cues: ["Rodillas alineadas", "Espalda neutra", "Profundidad controlada"]
-  },
-  {
-    id: "deadlift",
-    category: "Posterior",
-    name: "Peso muerto",
-    summary: "Bisagra de cadera para cadena posterior y fuerza global.",
-    cues: ["Barra cerca", "Cadera atrás", "Bloqueo fuerte"]
-  },
-  {
-    id: "pull-up",
-    category: "Espalda",
-    name: "Dominadas",
-    summary: "Tirón vertical para dorsales, bíceps y control corporal.",
-    cues: ["Pecho alto", "Codos abajo", "Rango completo"]
-  }
-];
-
-const fallbackArticles = [
-  {
-    tag: "Técnica",
-    title: "Cómo progresar sin lesionarte",
-    excerpt: "Sube carga cuando la técnica se mantenga estable y deja margen en las series clave."
-  },
-  {
-    tag: "Nutrición",
-    title: "Proteína y músculo",
-    excerpt: "Reparte proteína durante el día y prioriza alimentos sencillos antes de complicarte."
-  },
-  {
-    tag: "Recuperación",
-    title: "Descanso que sí cuenta",
-    excerpt: "Dormir bien, caminar y controlar volumen hace que la rutina funcione de verdad."
-  }
-];
+let content = { categories: [], articles: [], tools: [] };
+let activeTool = "compound";
 
 init();
 
-function init() {
-  setupEffects();
-  loadContent();
-  setupRoutineForm();
+async function init() {
+  setupTheme();
+  setupReveal();
+  setupForms();
+  content = await getJson("/api/content", fallbackContent());
+  renderCategories(content.categories);
+  renderArticles(content.articles);
+  renderTrending(content.trending || content.articles.slice(0, 6));
+  renderToolTabs(content.tools);
+  renderCalculator(activeTool);
 }
 
-function setupEffects() {
-  const revealObserver = new IntersectionObserver(
+function setupTheme() {
+  const stored = localStorage.getItem("theme");
+  if (stored === "dark") document.documentElement.classList.add("dark");
+
+  themeToggle.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+    localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+  });
+}
+
+function setupReveal() {
+  const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add("is-visible");
-          revealObserver.unobserve(entry.target);
+          observer.unobserve(entry.target);
         }
       });
     },
-    { threshold: 0.16 }
+    { threshold: 0.14 }
   );
 
-  document.querySelectorAll(".reveal").forEach((item) => revealObserver.observe(item));
+  document.querySelectorAll(".reveal").forEach((item) => observer.observe(item));
+}
 
-  const countObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          animateCount(entry.target);
-          countObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.55 }
-  );
+function setupForms() {
+  siteSearch.addEventListener("input", () => {
+    const query = siteSearch.value.trim().toLowerCase();
+    const filtered = content.articles.filter((article) =>
+      `${article.title} ${article.category} ${article.excerpt}`.toLowerCase().includes(query)
+    );
+    renderArticles(query ? filtered : content.articles);
+    searchCount.textContent = query ? `${filtered.length} results` : "50+ guides and tools";
+  });
 
-  document.querySelectorAll("[data-count]").forEach((item) => countObserver.observe(item));
+  stockForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const symbol = stockSymbol.value.trim().toUpperCase();
+    if (!symbol) return;
 
-  window.addEventListener("mousemove", (event) => {
-    cursorGlow.style.opacity = "1";
-    cursorGlow.style.left = `${event.clientX}px`;
-    cursorGlow.style.top = `${event.clientY}px`;
+    stockResult.className = "stock-result loading";
+    stockResult.innerHTML = `<strong>Analyzing ${escapeHtml(symbol)}...</strong><p>Checking recent price action, trend, volatility and drawdown.</p>`;
+
+    const analysis = await getJson(`/api/market-analysis?symbol=${encodeURIComponent(symbol)}`, null);
+    renderStockAnalysis(analysis);
+  });
+
+  newsletterForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    newsletterForm.innerHTML = `<strong>You're in. Welcome to MoneyNova.</strong>`;
   });
 }
 
-async function loadContent() {
-  const content = await getJson("/api/content", {
-    exercises: fallbackExercises,
-    articles: fallbackArticles
-  });
-
-  renderExercises(content.exercises);
-  renderArticles(content.articles);
-}
-
-function renderExercises(exercises) {
-  exerciseGrid.innerHTML = exercises
+function renderCategories(categories) {
+  categoryGrid.innerHTML = categories
     .map(
-      (exercise, index) => `
-        <article class="exercise-card reveal" style="transition-delay: ${index * 55}ms">
-          <span>${exercise.category}</span>
-          <h3>${exercise.name}</h3>
-          <p>${exercise.summary}</p>
-          <ul>
-            ${exercise.cues.map((cue) => `<li>${cue}</li>`).join("")}
-          </ul>
+      (category) => `
+        <article class="category-card reveal">
+          <span>${category.kicker}</span>
+          <h3>${category.title}</h3>
+          <p>${category.description}</p>
+          <a href="${category.url}">Explore guides</a>
         </article>
       `
     )
     .join("");
-
-  document.querySelectorAll(".exercise-card.reveal").forEach((item) => {
-    setTimeout(() => item.classList.add("is-visible"), 80);
-  });
+  refreshReveal(".category-card.reveal");
 }
 
 function renderArticles(articles) {
   articleGrid.innerHTML = articles
+    .slice(0, 12)
     .map(
-      (article, index) => `
-        <article class="article-card reveal" style="transition-delay: ${index * 70}ms">
-          <span>${article.tag}</span>
+      (article) => `
+        <article class="article-card reveal">
+          <div class="article-image">${article.imageLabel}</div>
+          <span>${article.category}</span>
           <h3>${article.title}</h3>
           <p>${article.excerpt}</p>
+          <a href="${article.slug}">Read article</a>
         </article>
       `
     )
     .join("");
-
-  document.querySelectorAll(".article-card.reveal").forEach((item) => {
-    setTimeout(() => item.classList.add("is-visible"), 80);
-  });
+  refreshReveal(".article-card.reveal");
 }
 
-function setupRoutineForm() {
-  daysInput.addEventListener("input", () => {
-    daysOutput.textContent = `${daysInput.value} días`;
-  });
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    result.className = "routine-plan";
-    result.innerHTML = `
-      <h3>Fitzerd Coach está pensando...</h3>
-      <p class="routine-note">Analizando objetivo, nivel, días y material disponible.</p>
-    `;
-
-    const payload = {
-      goal: document.querySelector("#goal").value,
-      level: document.querySelector("#level").value,
-      days: Number(daysInput.value),
-      equipment: document.querySelector("#equipment").value,
-      extras: [...document.querySelectorAll("fieldset input:checked")].map((item) => item.value)
-    };
-
-    const routine = await postJson("/api/routines", payload, buildFallbackRoutine(payload));
-    renderRoutine(routine);
-  });
+function renderTrending(items) {
+  trendingList.innerHTML = items
+    .slice(0, 6)
+    .map((item) => `<li><a href="${item.slug}">${item.title}</a></li>`)
+    .join("");
 }
 
-function renderRoutine(routine) {
-  const dayCards = routine.days
+function renderToolTabs(tools) {
+  toolTabs.innerHTML = tools
     .map(
-      (day) => `
-        <article class="day-card">
-          <strong>${day.title}</strong>
-          <ul>
-            ${day.items.map((item) => `<li>${item}</li>`).join("")}
-          </ul>
-        </article>
+      (tool) => `
+        <button class="${tool.id === activeTool ? "active" : ""}" data-tool="${tool.id}" type="button">
+          ${tool.title}
+        </button>
       `
     )
     .join("");
 
-  result.className = "routine-plan";
-  result.innerHTML = `
-    <h3>${routine.title}</h3>
-    <p class="routine-note">${routine.note}</p>
-    <p class="routine-note">${routine.guidance}</p>
-    <div class="day-list">${dayCards}</div>
+  toolTabs.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeTool = button.dataset.tool;
+      renderToolTabs(content.tools);
+      renderCalculator(activeTool);
+    });
+  });
+}
+
+function renderCalculator(toolId) {
+  const templates = {
+    compound: {
+      title: "Compound Interest Calculator",
+      fields: [
+        ["principal", "Initial amount", 1000],
+        ["monthly", "Monthly contribution", 150],
+        ["rate", "Annual return %", 7],
+        ["years", "Years", 10]
+      ],
+      calculate: ({ principal, monthly, rate, years }) => {
+        const monthlyRate = rate / 100 / 12;
+        const months = years * 12;
+        let value = principal;
+        for (let i = 0; i < months; i += 1) value = value * (1 + monthlyRate) + monthly;
+        return `Estimated future value: ${formatMoney(value)}`;
+      }
+    },
+    savings: {
+      title: "Savings Goal Calculator",
+      fields: [
+        ["goal", "Savings goal", 10000],
+        ["saved", "Already saved", 1500],
+        ["months", "Months", 18]
+      ],
+      calculate: ({ goal, saved, months }) => `Monthly target: ${formatMoney((goal - saved) / months)}`
+    },
+    debt: {
+      title: "Debt Repayment Calculator",
+      fields: [
+        ["debt", "Debt balance", 5000],
+        ["payment", "Monthly payment", 250],
+        ["rate", "APR %", 18]
+      ],
+      calculate: ({ debt, payment, rate }) => {
+        const monthlyRate = rate / 100 / 12;
+        let balance = debt;
+        let months = 0;
+        while (balance > 0 && months < 600) {
+          balance = balance * (1 + monthlyRate) - payment;
+          months += 1;
+        }
+        return months >= 600 ? "Payment is too low to estimate payoff." : `Debt-free estimate: ${months} months`;
+      }
+    },
+    salary: {
+      title: "Hourly to Salary Calculator",
+      fields: [
+        ["hourly", "Hourly rate", 18],
+        ["hours", "Hours per week", 40]
+      ],
+      calculate: ({ hourly, hours }) => `Annual salary estimate: ${formatMoney(hourly * hours * 52)}`
+    },
+    hustle: {
+      title: "Side Hustle Profit Calculator",
+      fields: [
+        ["revenue", "Monthly revenue", 1200],
+        ["costs", "Monthly costs", 260],
+        ["tax", "Tax reserve %", 20]
+      ],
+      calculate: ({ revenue, costs, tax }) => `Estimated monthly profit: ${formatMoney((revenue - costs) * (1 - tax / 100))}`
+    },
+    budget: {
+      title: "Budget Calculator",
+      fields: [
+        ["income", "Monthly income", 2400],
+        ["needs", "Needs %", 50],
+        ["wants", "Wants %", 30],
+        ["savings", "Savings %", 20]
+      ],
+      calculate: ({ income, needs, wants, savings }) =>
+        `Needs: ${formatMoney(income * needs / 100)} · Wants: ${formatMoney(income * wants / 100)} · Savings: ${formatMoney(income * savings / 100)}`
+    }
+  };
+
+  const tool = templates[toolId] || templates.compound;
+  calculatorPanel.innerHTML = `
+    <h3>${tool.title}</h3>
+    <form id="calculatorForm" class="calculator-form">
+      ${tool.fields.map(([id, label, value]) => `
+        <label>
+          ${label}
+          <input name="${id}" type="number" step="0.01" value="${value}" />
+        </label>
+      `).join("")}
+      <button class="primary-button" type="submit">Calculate</button>
+    </form>
+    <div class="calculator-result" id="calculatorResult">Adjust the numbers and calculate.</div>
+  `;
+
+  document.querySelector("#calculatorForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const values = Object.fromEntries(new FormData(event.currentTarget).entries());
+    Object.keys(values).forEach((key) => {
+      values[key] = Number(values[key]);
+    });
+    document.querySelector("#calculatorResult").textContent = tool.calculate(values);
+  });
+}
+
+function renderStockAnalysis(analysis) {
+  if (!analysis || analysis.error) {
+    stockResult.className = "stock-result danger";
+    stockResult.innerHTML = `<strong>Could not analyze that ticker.</strong><p>${analysis?.error || "Try another listed symbol such as AAPL or MSFT."}</p>`;
+    return;
+  }
+
+  const tone = analysis.rating === "High risk" ? "danger" : analysis.rating === "Balanced risk" ? "warning" : "good";
+  stockResult.className = `stock-result ${tone}`;
+  stockResult.innerHTML = `
+    <div class="risk-header">
+      <span>${analysis.symbol}</span>
+      <strong>${analysis.rating}</strong>
+    </div>
+    <p>${analysis.summary}</p>
+    <div class="market-grid">
+      <div><small>Price</small><strong>${formatMoney(analysis.price, "USD")}</strong></div>
+      <div><small>6M return</small><strong>${formatPercent(analysis.sixMonthReturn)}</strong></div>
+      <div><small>Volatility</small><strong>${formatPercent(analysis.volatility)}</strong></div>
+      <div><small>Max drawdown</small><strong>${formatPercent(analysis.maxDrawdown)}</strong></div>
+    </div>
+    <ul>
+      ${analysis.signals.map((signal) => `<li>${signal}</li>`).join("")}
+    </ul>
+    <p class="fine-print">${analysis.disclaimer}</p>
   `;
 }
 
@@ -208,61 +281,36 @@ async function getJson(path, fallback) {
   }
 }
 
-async function postJson(path, payload, fallback) {
-  try {
-    const response = await fetch(path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error("Request failed");
-    return await response.json();
-  } catch {
-    return fallback;
-  }
+function refreshReveal(selector) {
+  setTimeout(() => {
+    document.querySelectorAll(selector).forEach((item) => item.classList.add("is-visible"));
+  }, 80);
 }
 
-function animateCount(element) {
-  const target = Number(element.dataset.count);
-  const suffix = element.nextElementSibling?.textContent?.startsWith("%") ? "%" : "";
-  const duration = 1100;
-  const start = performance.now();
-
-  function tick(now) {
-    const progress = Math.min((now - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    element.textContent = `${Math.round(target * eased)}${suffix}`;
-    if (progress < 1) requestAnimationFrame(tick);
-  }
-
-  requestAnimationFrame(tick);
+function formatMoney(value, currency = "EUR") {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
 }
 
-function buildFallbackRoutine(payload) {
-  const labels = {
-    muscle: "Rutina de hipertrofia Fitzerd",
-    strength: "Rutina de fuerza Fitzerd",
-    fatloss: "Rutina de definición Fitzerd",
-    health: "Rutina de salud Fitzerd"
-  };
+function formatPercent(value) {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
 
-  const split = ["Torso", "Pierna", "Empuje", "Tirón", "Full body", "Core + cardio"];
-  const items = [
-    ["Press banca 4x8", "Remo sentado 4x10", "Elevaciones laterales 3x14", "Plancha 3x45s"],
-    ["Sentadilla 4x8", "Peso muerto rumano 3x10", "Zancadas 3x12", "Gemelo 4x14"],
-    ["Press militar 4x8", "Fondos asistidos 3x10", "Extensión tríceps 3x12", "Cardio zona 2 12min"],
-    ["Dominadas o jalón 4x8", "Remo con barra 4x10", "Face pull 3x15", "Curl bíceps 3x12"],
-    ["Prensa 3x12", "Press mancuernas 3x10", "Jalón 3x12", "Farmer walk 4x30m"],
-    ["Dead bug 3x12", "Pallof press 3x12", "Bici 8x30s", "Movilidad 8min"]
-  ];
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+}
 
+function fallbackContent() {
   return {
-    title: labels[payload.goal],
-    note: "Plan generado localmente si el backend no está disponible.",
-    guidance: "Mantén técnica limpia, registra cargas y ajusta volumen si la fatiga sube demasiado.",
-    days: Array.from({ length: payload.days }, (_, index) => ({
-      title: `Día ${index + 1}: ${split[index % split.length]}`,
-      items: items[index % items.length]
-    }))
+    categories: [],
+    articles: [],
+    trending: [],
+    tools: [
+      { id: "compound", title: "Compound Interest" },
+      { id: "savings", title: "Savings Goal" },
+      { id: "debt", title: "Debt Repayment" },
+      { id: "salary", title: "Hourly to Salary" },
+      { id: "hustle", title: "Side Hustle Profit" },
+      { id: "budget", title: "Budget" }
+    ]
   };
 }

@@ -1,17 +1,18 @@
 {
-  "name": "fitzerd",
+  "name": "moneynova",
   "version": "1.0.0",
-  "description": "Plataforma fitness con ejercicios, articulos y generador de rutinas personalizado.",
+  "description": "Professional money blog with financial tools, SEO content and an educational market risk bot.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "check": "node --check app.js && node --check server.js"
   },
   "keywords": [
-    "fitness",
-    "gym",
-    "rutinas",
-    "ejercicios"
+    "money",
+    "finance",
+    "investing",
+    "seo",
+    "calculators"
   ],
   "author": "Bruno",
   "license": "MIT"
