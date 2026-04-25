@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salud+ | Rutinas de gym inteligentes</title>
+    <meta
+      name="description"
+      content="Web profesional de ejercicios de gym con rutinas personalizadas, planes semanales y un agente fitness."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#inicio" aria-label="Salud+ inicio">
+        <span class="brand-mark">S+</span>
+        <span>Salud+</span>
+      </a>
+      <nav class="nav-links" aria-label="Principal">
+        <a href="#ejercicios">Ejercicios</a>
+        <a href="#rutina">Rutina IA</a>
+        <a href="#progreso">Progreso</a>
+      </nav>
+      <a class="nav-action" href="#rutina">Crear rutina</a>
+    </header>
+
+    <main>
+      <section class="hero" id="inicio" aria-label="Inicio">
+        <img src="assets/hero-fitness.png" alt="Entrenamiento de fuerza en un gimnasio moderno" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Gym, salud y estructura</p>
+          <h1>Entrena con una rutina que se adapta a ti.</h1>
+          <p class="hero-copy">
+            Planes claros, ejercicios bien organizados y un agente fitness que te genera una
+            semana de entrenamiento según tu objetivo, nivel y material disponible.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#rutina">Generar rutina</a>
+            <a class="ghost-button" href="#ejercicios">Ver ejercicios</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics-band" aria-label="Resumen">
+        <div>
+          <strong>42</strong>
+          <span>ejercicios base</span>
+        </div>
+        <div>
+          <strong>4</strong>
+          <span>objetivos principales</span>
+        </div>
+        <div>
+          <strong>7</strong>
+          <span>días planificados</span>
+        </div>
+        <div>
+          <strong>100%</strong>
+          <span>personalizable</span>
+        </div>
+      </section>
+
+      <section class="section-shell" id="ejercicios">
+        <div class="section-heading">
+          <p class="eyebrow">Biblioteca</p>
+          <h2>Ejercicios organizados por objetivo.</h2>
+          <p>
+            Una base visual y clara para montar rutinas de fuerza, hipertrofia, pérdida de grasa
+            o movilidad sin perder el foco.
+          </p>
+        </div>
+
+        <div class="exercise-grid">
+          <article class="exercise-card strength">
+            <span>01</span>
+            <h3>Fuerza</h3>
+            <p>Sentadilla, press banca, peso muerto, dominadas y progresiones pesadas.</p>
+          </article>
+          <article class="exercise-card muscle">
+            <span>02</span>
+            <h3>Hipertrofia</h3>
+            <p>Volumen controlado, accesorios por grupo muscular y series cerca del fallo.</p>
+          </article>
+          <article class="exercise-card cardio">
+            <span>03</span>
+            <h3>Definición</h3>
+            <p>Entrenos metabólicos, superseries, cardio inteligente y trabajo de core.</p>
+          </article>
+          <article class="exercise-card mobility">
+            <span>04</span>
+            <h3>Movilidad</h3>
+            <p>Activación, estabilidad, rangos de movimiento y recuperación activa.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="agent-section" id="rutina">
+        <div class="agent-panel">
+          <div class="section-heading compact">
+            <p class="eyebrow">Agente personalizado</p>
+            <h2>Coach Salud+ genera tu rutina.</h2>
+            <p>
+              Ajusta tu objetivo, experiencia, días y material. El agente crea una propuesta
+              semanal con ejercicios, series y enfoque.
+            </p>
+          </div>
+
+          <form class="routine-form" id="routineForm">
+            <label>
+              Objetivo
+              <select id="goal">
+                <option value="muscle">Ganar músculo</option>
+                <option value="strength">Fuerza</option>
+                <option value="fatloss">Perder grasa</option>
+                <option value="health">Salud general</option>
+              </select>
+            </label>
+
+            <label>
+              Nivel
+              <select id="level">
+                <option value="beginner">Principiante</option>
+                <option value="intermediate">Intermedio</option>
+                <option value="advanced">Avanzado</option>
+              </select>
+            </label>
+
+            <label>
+              Días por semana
+              <input id="days" type="range" min="2" max="6" value="4" />
+              <output id="daysOutput">4 días</output>
+            </label>
+
+            <label>
+              Material
+              <select id="equipment">
+                <option value="full">Gimnasio completo</option>
+                <option value="dumbbells">Mancuernas y banco</option>
+                <option value="bodyweight">Peso corporal</option>
+              </select>
+            </label>
+
+            <fieldset>
+              <legend>Enfoque extra</legend>
+              <label class="check-option">
+                <input type="checkbox" value="core" checked />
+                Core
+              </label>
+              <label class="check-option">
+                <input type="checkbox" value="mobility" />
+                Movilidad
+              </label>
+              <label class="check-option">
+                <input type="checkbox" value="cardio" checked />
+                Cardio
+              </label>
+            </fieldset>
+
+            <button class="primary-button full" type="submit">Generar plan</button>
+          </form>
+        </div>
+
+        <aside class="routine-output" aria-live="polite">
+          <div class="agent-status">
+            <span class="pulse"></span>
+            <p>Coach Salud+ listo</p>
+          </div>
+          <div id="routineResult" class="result-empty">
+            <h3>Tu rutina aparecerá aquí.</h3>
+            <p>Completa el formulario y genera una semana de entrenamiento personalizada.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section-shell progress" id="progreso">
+        <div class="section-heading">
+          <p class="eyebrow">Sistema</p>
+          <h2>Entrenar bien también es medir bien.</h2>
+          <p>
+            La web queda preparada para añadir perfiles, historial, favoritos, calendario y una
+            integración real con IA para rutinas más avanzadas.
+          </p>
+        </div>
+        <div class="progress-row">
+          <div>
+            <span class="dot"></span>
+            <strong>Plan semanal</strong>
+            <p>Rutinas divididas por día, objetivo y carga.</p>
+          </div>
+          <div>
+            <span class="dot"></span>
+            <strong>Recuperación</strong>
+            <p>Descansos y movilidad según volumen de entreno.</p>
+          </div>
+          <div>
+            <span class="dot"></span>
+            <strong>Escalable</strong>
+            <p>Lista para conectar login, base de datos y OpenAI API.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
