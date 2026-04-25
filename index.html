@@ -3,112 +3,108 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Salud+ | Rutinas de gym inteligentes</title>
+    <title>Fitzerd | Plataforma fitness inteligente</title>
     <meta
       name="description"
-      content="Web profesional de ejercicios de gym con rutinas personalizadas, planes semanales y un agente fitness."
+      content="Fitzerd es una plataforma profesional de ejercicios de gym, artículos fitness y rutinas generadas por un agente personalizado."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="cursor-glow" aria-hidden="true"></div>
+
     <header class="site-header">
-      <a class="brand" href="#inicio" aria-label="Salud+ inicio">
-        <span class="brand-mark">S+</span>
-        <span>Salud+</span>
+      <a class="brand" href="#inicio" aria-label="Fitzerd inicio">
+        <img src="assets/fitzerd-logo.svg" alt="" />
+        <span>Fitzerd</span>
       </a>
       <nav class="nav-links" aria-label="Principal">
         <a href="#ejercicios">Ejercicios</a>
-        <a href="#rutina">Rutina IA</a>
+        <a href="#articulos">Artículos</a>
+        <a href="#rutina">Agente</a>
         <a href="#progreso">Progreso</a>
       </nav>
-      <a class="nav-action" href="#rutina">Crear rutina</a>
+      <a class="nav-action magnetic" href="#rutina">Crear rutina</a>
     </header>
 
     <main>
       <section class="hero" id="inicio" aria-label="Inicio">
         <img src="assets/hero-fitness.png" alt="Entrenamiento de fuerza en un gimnasio moderno" />
         <div class="hero-overlay"></div>
-        <div class="hero-content">
-          <p class="eyebrow">Gym, salud y estructura</p>
-          <h1>Entrena con una rutina que se adapta a ti.</h1>
+        <div class="hero-orbit" aria-hidden="true"></div>
+        <div class="hero-content reveal">
+          <p class="eyebrow">Fitness inteligente</p>
+          <h1>Fitzerd convierte tus objetivos en entrenamientos reales.</h1>
           <p class="hero-copy">
-            Planes claros, ejercicios bien organizados y un agente fitness que te genera una
-            semana de entrenamiento según tu objetivo, nivel y material disponible.
+            Ejercicios, artículos y un agente fitness que diseña rutinas por nivel, material,
+            días disponibles y objetivo. Profesional, claro y listo para crecer.
           </p>
           <div class="hero-actions">
-            <a class="primary-button" href="#rutina">Generar rutina</a>
-            <a class="ghost-button" href="#ejercicios">Ver ejercicios</a>
+            <a class="primary-button magnetic" href="#rutina">Generar rutina</a>
+            <a class="ghost-button magnetic" href="#ejercicios">Explorar ejercicios</a>
           </div>
         </div>
       </section>
 
       <section class="metrics-band" aria-label="Resumen">
-        <div>
-          <strong>42</strong>
-          <span>ejercicios base</span>
+        <div class="reveal">
+          <strong data-count="54">0</strong>
+          <span>ejercicios guiados</span>
         </div>
-        <div>
-          <strong>4</strong>
-          <span>objetivos principales</span>
+        <div class="reveal">
+          <strong data-count="12">0</strong>
+          <span>artículos fitness</span>
         </div>
-        <div>
-          <strong>7</strong>
+        <div class="reveal">
+          <strong data-count="7">0</strong>
           <span>días planificados</span>
         </div>
-        <div>
-          <strong>100%</strong>
-          <span>personalizable</span>
+        <div class="reveal">
+          <strong data-count="100">0</strong>
+          <span>% personalizable</span>
         </div>
       </section>
 
       <section class="section-shell" id="ejercicios">
-        <div class="section-heading">
+        <div class="section-heading reveal">
           <p class="eyebrow">Biblioteca</p>
-          <h2>Ejercicios organizados por objetivo.</h2>
+          <h2>Ejercicios por músculo, objetivo y material.</h2>
           <p>
-            Una base visual y clara para montar rutinas de fuerza, hipertrofia, pérdida de grasa
-            o movilidad sin perder el foco.
+            Fitzerd organiza movimientos clave para que el usuario entienda qué entrenar, cómo
+            ejecutarlo y cuándo incluirlo en su rutina.
           </p>
         </div>
 
-        <div class="exercise-grid">
-          <article class="exercise-card strength">
-            <span>01</span>
-            <h3>Fuerza</h3>
-            <p>Sentadilla, press banca, peso muerto, dominadas y progresiones pesadas.</p>
-          </article>
-          <article class="exercise-card muscle">
-            <span>02</span>
-            <h3>Hipertrofia</h3>
-            <p>Volumen controlado, accesorios por grupo muscular y series cerca del fallo.</p>
-          </article>
-          <article class="exercise-card cardio">
-            <span>03</span>
-            <h3>Definición</h3>
-            <p>Entrenos metabólicos, superseries, cardio inteligente y trabajo de core.</p>
-          </article>
-          <article class="exercise-card mobility">
-            <span>04</span>
-            <h3>Movilidad</h3>
-            <p>Activación, estabilidad, rangos de movimiento y recuperación activa.</p>
-          </article>
+        <div class="exercise-grid" id="exerciseGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="articles-section" id="articulos">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Contenido</p>
+          <h2>Artículos para entrenar con criterio.</h2>
+          <p>
+            Guías breves sobre técnica, nutrición, descanso y progresión. Pensadas para que la
+            plataforma no sea solo bonita, sino útil.
+          </p>
         </div>
+
+        <div class="article-grid" id="articleGrid" aria-live="polite"></div>
       </section>
 
       <section class="agent-section" id="rutina">
-        <div class="agent-panel">
+        <div class="agent-panel reveal">
           <div class="section-heading compact">
             <p class="eyebrow">Agente personalizado</p>
-            <h2>Coach Salud+ genera tu rutina.</h2>
+            <h2>Fitzerd Coach genera tu rutina.</h2>
             <p>
-              Ajusta tu objetivo, experiencia, días y material. El agente crea una propuesta
-              semanal con ejercicios, series y enfoque.
+              El frontend habla con el backend para generar una propuesta semanal. Después podremos
+              conectar este mismo flujo a OpenAI para que sea un agente real con memoria y perfil.
             </p>
           </div>
 
@@ -163,14 +159,14 @@
               </label>
             </fieldset>
 
-            <button class="primary-button full" type="submit">Generar plan</button>
+            <button class="primary-button full magnetic" type="submit">Generar plan</button>
           </form>
         </div>
 
-        <aside class="routine-output" aria-live="polite">
+        <aside class="routine-output reveal" aria-live="polite">
           <div class="agent-status">
             <span class="pulse"></span>
-            <p>Coach Salud+ listo</p>
+            <p>Fitzerd Coach conectado</p>
           </div>
           <div id="routineResult" class="result-empty">
             <h3>Tu rutina aparecerá aquí.</h3>
@@ -180,29 +176,29 @@
       </section>
 
       <section class="section-shell progress" id="progreso">
-        <div class="section-heading">
+        <div class="section-heading reveal">
           <p class="eyebrow">Sistema</p>
-          <h2>Entrenar bien también es medir bien.</h2>
+          <h2>Una base lista para convertirse en producto.</h2>
           <p>
-            La web queda preparada para añadir perfiles, historial, favoritos, calendario y una
-            integración real con IA para rutinas más avanzadas.
+            Ya hay backend, APIs de contenido y generación de rutinas. La siguiente evolución es
+            login, perfiles, historial y un agente IA conectado a una API real.
           </p>
         </div>
         <div class="progress-row">
-          <div>
+          <div class="reveal">
             <span class="dot"></span>
-            <strong>Plan semanal</strong>
-            <p>Rutinas divididas por día, objetivo y carga.</p>
+            <strong>Backend propio</strong>
+            <p>Servidor Node con endpoints para ejercicios, artículos y rutinas.</p>
           </div>
-          <div>
+          <div class="reveal">
             <span class="dot"></span>
-            <strong>Recuperación</strong>
-            <p>Descansos y movilidad según volumen de entreno.</p>
+            <strong>Contenido dinámico</strong>
+            <p>La web pinta ejercicios y artículos desde datos centralizados.</p>
           </div>
-          <div>
+          <div class="reveal">
             <span class="dot"></span>
-            <strong>Escalable</strong>
-            <p>Lista para conectar login, base de datos y OpenAI API.</p>
+            <strong>Preparada para IA</strong>
+            <p>El flujo del agente ya está separado para conectar un modelo después.</p>
           </div>
         </div>
       </section>

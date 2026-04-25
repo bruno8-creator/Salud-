@@ -1,14 +1,32 @@
-# Salud+
+# Fitzerd
 
-Web estética y profesional para ejercicios de gym, con biblioteca de objetivos y un generador de rutinas personalizado tipo agente fitness.
+Plataforma fitness estética y profesional con ejercicios, artículos y un agente generador de rutinas.
 
-## Qué incluye
+## Incluye
 
-- Landing visual con imagen hero propia.
-- Secciones de ejercicios por objetivo.
-- Formulario para generar rutinas según objetivo, nivel, días y material.
-- Agente local `Coach Salud+` que crea un plan semanal en el navegador.
+- Landing responsive con imagen hero propia.
+- Logo SVG profesional de Fitzerd.
+- Efectos visuales: reveal on scroll, contador animado, glow de cursor, hover premium y movimiento sutil del hero.
+- Backend Node sin dependencias externas.
+- APIs para ejercicios, artículos, contenido completo y generación de rutinas.
+- Agente `Fitzerd Coach` conectado al backend.
 
-## Cómo abrir
+## Ejecutar
 
-Abre `index.html` en el navegador o sirve la carpeta con cualquier servidor estático.
+```bash
+npm start
+```
+
+Después abre:
+
+```text
+http://127.0.0.1:5173/
+```
+
+## Endpoints
+
+- `GET /api/health`
+- `GET /api/exercises`
+- `GET /api/articles`
+- `GET /api/content`
+- `POST /api/routines`

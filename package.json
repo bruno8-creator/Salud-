@@ -1,0 +1,18 @@
+{
+  "name": "fitzerd",
+  "version": "1.0.0",
+  "description": "Plataforma fitness con ejercicios, articulos y generador de rutinas personalizado.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check app.js && node --check server.js"
+  },
+  "keywords": [
+    "fitness",
+    "gym",
+    "rutinas",
+    "ejercicios"
+  ],
+  "author": "Bruno",
+  "license": "MIT"
+}
