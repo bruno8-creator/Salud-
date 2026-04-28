@@ -74,7 +74,7 @@ function filterExercises(url) {
 function buildMockExam(input = {}) {
   const subject = input.subject || exercises[0]?.subject;
   const topic = input.topic || "all";
-  const amount = clamp(Number(input.amount) || 5, 3, 10);
+  const amount = clamp(Number(input.amount) || 5, 3, 6);
   const duration = clamp(Number(input.duration) || 90, 45, 180);
   const difficulty = input.difficulty || "mixed";
   const questionType = input.questionType || "problema_guiado";
@@ -88,31 +88,39 @@ function buildMockExam(input = {}) {
   const selected = input.generateNew
     ? generateAiExercises({ subject, topic, difficulty, questionType, amount })
     : balancedPick(pool.length ? pool : exercises.filter((exercise) => exercise.subject === subject), amount);
-  const totalMarks = selected.reduce((sum, exercise) => sum + Number(exercise.marks || 0), 0);
+  const examQuestions = normalizeExamMarks(selected);
+  const totalMarks = examQuestions.reduce((sum, exercise) => sum + Number(exercise.marks || 0), 0);
 
   return {
     id: `SIM-${slugify(subject)}-${Date.now()}`,
-    title: input.generateNew ? `Examen IA PAU - ${subject}` : `Simulacro PAU - ${subject}`,
+    title: input.generateNew ? `Examen PAU generado - ${subject}` : `Simulacro PAU - ${subject}`,
     subject,
     duration,
     totalMarks,
+    format: "PAU-style official practice paper",
+    header: {
+      course: "2º Bachillerato",
+      examType: "PAU / EBAU",
+      allowedMaterial: buildAllowedMaterial(subject),
+      scoring: "La prueba se califica sobre 10 puntos."
+    },
     instructions: [
-      "Lee todas las preguntas antes de empezar.",
-      "Justifica los procedimientos cuando el ejercicio lo requiera.",
-      "Reparte el tiempo según la puntuación de cada pregunta.",
-      "Al terminar, compara tu respuesta con la guía de corrección."
+      "Lee todas las preguntas antes de empezar y revisa la puntuación de cada apartado.",
+      "Justifica todos los pasos: planteamiento, desarrollo y conclusión.",
+      "Se valorará la claridad, el uso correcto de conceptos y la interpretación del resultado.",
+      "No se puntuará únicamente el resultado numérico si no aparece el procedimiento."
     ],
     sections: [
       {
-        title: "Bloque A - Ejercicios principales",
-        questions: selected.slice(0, Math.ceil(selected.length / 2)).map(toExamQuestion)
+        title: "Bloque A - Cuestiones obligatorias",
+        questions: examQuestions.slice(0, Math.ceil(examQuestions.length / 2)).map(toExamQuestion)
       },
       {
-        title: "Bloque B - Aplicación y cierre",
-        questions: selected.slice(Math.ceil(selected.length / 2)).map(toExamQuestion)
+        title: "Bloque B - Problemas de desarrollo",
+        questions: examQuestions.slice(Math.ceil(examQuestions.length / 2)).map(toExamQuestion)
       }
     ],
-    answerKey: selected.map((exercise, index) => ({
+    answerKey: examQuestions.map((exercise, index) => ({
       number: index + 1,
       id: exercise.id,
       topic: exercise.topic,
@@ -190,34 +198,74 @@ function generateAiExercises({ subject, topic, difficulty, questionType, amount 
 
   return Array.from({ length: amount }, (_, index) => {
     const number = index + 1;
-    const marks = questionType === "desarrollo" ? 2 : 2.5;
-    const statement = buildGeneratedStatement({ subject, topic: baseTopic, questionType, number });
+    const statement = buildGeneratedStatement({ subject, topic: baseTopic, questionType, number, difficulty });
     return {
       id: `AI-${slugify(subject)}-${slugify(baseTopic)}-${Date.now()}-${number}`,
       subject,
       topic: baseTopic,
       difficulty: label,
-      marks,
+      marks: 2,
       question: statement,
       solution: buildGeneratedSolution({ subject, topic: baseTopic, questionType, statement })
     };
   });
 }
 
-function buildGeneratedStatement({ subject, topic, questionType, number }) {
+function buildGeneratedStatement({ subject, topic, questionType, number, difficulty }) {
+  const seed = number + topic.length + subject.length;
+  const subjectText = subject.toLowerCase();
+  const topicText = topic.toLowerCase();
+
+  if (subjectText.includes("matemáticas") && topicText.includes("deriv")) {
+    const a = 2 + (seed % 4);
+    const b = 1 + (seed % 5);
+    return `Sea f(x)=${a}x^3-${b}x^2+${number}x-${a}. a) Calcula f'(x). b) Halla los puntos críticos de f. c) Clasifica cada punto crítico usando f''(x) o una tabla de signos. d) Explica qué información aporta este estudio sobre la gráfica de la función.`;
+  }
+
+  if (subjectText.includes("matemáticas") && topicText.includes("integr")) {
+    const k = 3 + (seed % 5);
+    return `Calcula el área de la región limitada por las curvas y=${k}x e y=x^2. a) Determina los puntos de corte. b) Plantea la integral definida adecuada. c) Calcula el área exacta. d) Justifica por qué la función superior es la que has elegido.`;
+  }
+
+  if (subjectText.includes("matemáticas") && topicText.includes("matriz")) {
+    const a = 1 + (seed % 4);
+    return `Sea A = [[1, ${a}], [${a + 2}, 1]]. a) Calcula det(A). b) Estudia si A es invertible. c) Si existe, halla A^(-1). d) Comprueba el resultado multiplicando A por su inversa.`;
+  }
+
+  if (subjectText.includes("física")) {
+    const velocity = 12 + seed;
+    const time = 2 + (seed % 4);
+    return `Un cuerpo se desplaza con velocidad inicial ${velocity} m/s durante ${time} s bajo aceleración constante. a) Escribe las ecuaciones que usarías. b) Calcula el desplazamiento si a=2 m/s². c) Interpreta físicamente el signo de la aceleración. d) Indica las unidades de cada magnitud.`;
+  }
+
+  if (subjectText.includes("química")) {
+    return `Se prepara una disolución ácida de concentración 0,01 M. a) Identifica si el cálculo de pH requiere considerar disociación completa. b) Calcula el pH para un ácido fuerte monoprótico. c) Explica cómo cambiaría el razonamiento si el ácido fuera débil. d) Indica dos errores frecuentes en este tipo de ejercicio.`;
+  }
+
+  if (subjectText.includes("lengua")) {
+    return `Lee este enunciado base: "La tecnología ha cambiado la forma en que los jóvenes estudian, pero no siempre mejora su concentración". a) Resume la idea principal. b) Formula el tema en una frase. c) Propón una tesis para un comentario crítico. d) Escribe un párrafo argumentativo con dos conectores.`;
+  }
+
+  if (subjectText.includes("historia")) {
+    return `Desarrolla una pregunta tipo PAU sobre ${topic}. a) Sitúa el tema en su contexto cronológico. b) Explica dos causas. c) Explica dos consecuencias. d) Valora su importancia histórica en la evolución de España contemporánea.`;
+  }
+
   if (questionType === "desarrollo") {
-    return `Desarrolla de forma razonada el concepto principal de ${topic} en ${subject} e incluye un ejemplo tipo PAU.`;
+    return `Desarrolla de forma razonada ${topic} en ${subject}. Incluye definición, contexto, ejemplo tipo PAU y conclusión. La respuesta debe estar organizada en apartados.`;
   }
+
   if (questionType === "comentario") {
-    return `Analiza el siguiente caso relacionado con ${topic} y explica qué pasos seguirías para resolverlo en un examen PAU. Caso ${number}: plantea una situación con datos incompletos y justifica tus decisiones.`;
+    return `Analiza un caso relacionado con ${topic}. a) Identifica el problema. b) Explica los conceptos implicados. c) Resuelve o comenta el caso paso a paso. d) Redacta una conclusión final de 4-5 líneas.`;
   }
+
   if (questionType === "calculo") {
-    return `Resuelve un ejercicio de cálculo de ${topic} en ${subject}. Define los datos, aplica el procedimiento y comprueba el resultado final.`;
+    return `Resuelve un ejercicio de cálculo de ${topic} en ${subject}. a) Define datos e incógnitas. b) Plantea la fórmula o método. c) Desarrolla el cálculo. d) Comprueba e interpreta el resultado.`;
   }
-  return `Ejercicio guiado de ${topic} (${subject}). Apartado a) identifica el método. Apartado b) resuelve el caso propuesto. Apartado c) interpreta el resultado en contexto PAU.`;
+
+  return `Ejercicio PAU de ${topic} (${subject}). a) Identifica el método. b) Resuelve el caso propuesto con procedimiento completo. c) Interpreta el resultado. d) Señala un error típico que debe evitarse.`;
 }
 
-function buildGeneratedSolution({ topic, questionType }) {
+function buildGeneratedSolution({ subject, topic, questionType, statement }) {
   const core = [
     `Identificar que el ejercicio pertenece a ${topic}.`,
     "Anotar datos, incógnitas y objetivo.",
@@ -228,7 +276,12 @@ function buildGeneratedSolution({ topic, questionType }) {
   if (questionType === "desarrollo") {
     return `${core.join(" ")} La respuesta debe incluir definición, explicación, ejemplo y cierre comparando con el enunciado.`;
   }
-  return `${core.join(" ")} La solución completa debe mostrar el planteamiento, el desarrollo y una conclusión final clara.`;
+
+  if (String(subject).toLowerCase().includes("matemáticas")) {
+    return `${core.join(" ")} En matemáticas se corrige especialmente el planteamiento algebraico, el desarrollo ordenado y la comprobación del resultado. No basta con escribir el resultado final.`;
+  }
+
+  return `${core.join(" ")} La solución completa debe mostrar el planteamiento, el desarrollo y una conclusión final clara. Enunciado generado: ${statement}`;
 }
 
 function buildKeyIdeas(subject, topic) {
@@ -250,6 +303,30 @@ function toExamQuestion(exercise, index) {
     marks: enriched.marks,
     statement: enriched.enhanced_question
   };
+}
+
+function normalizeExamMarks(selected) {
+  const count = selected.length || 1;
+  const base = Number((10 / count).toFixed(2));
+  let accumulated = 0;
+
+  return selected.map((exercise, index) => {
+    const marks = index === count - 1 ? Number((10 - accumulated).toFixed(2)) : base;
+    accumulated += marks;
+    return {
+      ...exercise,
+      marks
+    };
+  });
+}
+
+function buildAllowedMaterial(subject) {
+  const text = String(subject).toLowerCase();
+  if (text.includes("matemáticas") || text.includes("física") || text.includes("química")) {
+    return "Calculadora no programable cuando la normativa de la comunidad lo permita.";
+  }
+  if (text.includes("inglés")) return "No se permite diccionario salvo indicación expresa.";
+  return "Material ordinario de escritura. No se permite documentación adicional.";
 }
 
 function buildRubric(exercise) {

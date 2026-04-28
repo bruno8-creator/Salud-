@@ -594,6 +594,12 @@ h2 {
   margin-bottom: 4px;
 }
 
+.card-note {
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+
 .ai-card textarea {
   background: #fff;
   border: 1px solid var(--line);
@@ -952,6 +958,16 @@ output {
   margin: 8px 0;
 }
 
+.official-meta {
+  background: #f8faff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 10px;
+  padding: 10px;
+}
+
 .exam-instructions,
 .exam-section,
 .answer-key {
@@ -979,6 +995,12 @@ output {
 .answer-key p {
   color: var(--muted);
   line-height: 1.65;
+}
+
+.exam-paper.compact .exam-question strong {
+  color: var(--ink);
+  display: block;
+  margin-bottom: 8px;
 }
 
 .progress-layout {

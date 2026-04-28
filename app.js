@@ -539,38 +539,7 @@ async function buildMockExam() {
   }
 
   mockResult.innerHTML = `
-    <div class="exam-paper">
-      <div class="exam-paper-cover">
-        <span>${exam.id}</span>
-        <h3>${exam.title}</h3>
-        <p>${exam.duration} minutos · ${exam.totalMarks.toFixed(1)} puntos</p>
-      </div>
-      <div class="exam-instructions">
-        <strong>Instrucciones</strong>
-        <ol>${exam.instructions.map((item) => `<li>${item}</li>`).join("")}</ol>
-      </div>
-      ${exam.sections.map((section, sectionIndex) => `
-        <section class="exam-section">
-          <h4>${section.title}</h4>
-          ${section.questions.map((question, index) => `
-            <article class="exam-question">
-              <strong>${sectionIndex + 1}.${index + 1} · ${question.topic} · ${question.marks} pts</strong>
-              <p>${question.statement}</p>
-            </article>
-          `).join("")}
-        </section>
-      `).join("")}
-      <details class="answer-key">
-        <summary>Ver hoja de corrección</summary>
-        ${exam.answerKey.map((item) => `
-          <article>
-            <strong>${item.number}. ${item.topic} · ${item.marks} pts</strong>
-            <p>${item.solution}</p>
-            <ul>${item.rubric.map((line) => `<li>${line}</li>`).join("")}</ul>
-          </article>
-        `).join("")}
-      </details>
-    </div>
+    ${renderExamOutput(exam)}
   `;
 }
 
@@ -665,9 +634,19 @@ function renderExamOutput(exam) {
   return `
     <div class="exam-paper compact">
       <div class="exam-paper-cover">
-        <span>${exam.id}</span>
+        <span>${exam.header.examType} · ${exam.id}</span>
         <h3>${exam.title}</h3>
-        <p>${exam.duration} minutos · ${exam.totalMarks.toFixed(1)} puntos</p>
+        <p>${exam.header.course} · ${exam.duration} minutos · ${exam.totalMarks.toFixed(1)} puntos</p>
+        <div class="official-meta">
+          <strong>Material:</strong> ${exam.header.allowedMaterial}
+        </div>
+        <div class="official-meta">
+          <strong>Criterio general:</strong> ${exam.header.scoring}
+        </div>
+      </div>
+      <div class="exam-instructions">
+        <strong>Instrucciones del examen</strong>
+        <ol>${exam.instructions.map((item) => `<li>${item}</li>`).join("")}</ol>
       </div>
       ${exam.sections.map((section, sectionIndex) => `
         <section class="exam-section">
@@ -681,11 +660,12 @@ function renderExamOutput(exam) {
         </section>
       `).join("")}
       <details class="answer-key">
-        <summary>Soluciones generadas</summary>
+        <summary>Hoja de corrección y soluciones</summary>
         ${exam.answerKey.map((item) => `
           <article>
-            <strong>${item.number}. ${item.topic}</strong>
+            <strong>${item.number}. ${item.topic} · ${item.marks} pts</strong>
             <p>${item.solution}</p>
+            ${item.rubric ? `<ul>${item.rubric.map((line) => `<li>${line}</li>`).join("")}</ul>` : ""}
           </article>
         `).join("")}
       </details>
