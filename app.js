@@ -39,6 +39,22 @@ const mockOutput = document.querySelector("#mockOutput");
 const buildMockButton = document.querySelector("#buildMockButton");
 const mockResult = document.querySelector("#mockResult");
 const progressList = document.querySelector("#progressList");
+const tutorSubject = document.querySelector("#tutorSubject");
+const tutorTopic = document.querySelector("#tutorTopic");
+const tutorMessage = document.querySelector("#tutorMessage");
+const generalTutorButton = document.querySelector("#generalTutorButton");
+const generalTutorOutput = document.querySelector("#generalTutorOutput");
+const aiExamSubject = document.querySelector("#aiExamSubject");
+const aiExamTopic = document.querySelector("#aiExamTopic");
+const aiQuestionType = document.querySelector("#aiQuestionType");
+const aiExamDifficulty = document.querySelector("#aiExamDifficulty");
+const aiExamButton = document.querySelector("#aiExamButton");
+const aiExamOutput = document.querySelector("#aiExamOutput");
+const lessonSubject = document.querySelector("#lessonSubject");
+const lessonTopic = document.querySelector("#lessonTopic");
+const lessonLevel = document.querySelector("#lessonLevel");
+const lessonButton = document.querySelector("#lessonButton");
+const lessonOutput = document.querySelector("#lessonOutput");
 let lastTutorExerciseId = "";
 
 let subjects = [];
@@ -58,6 +74,7 @@ async function init() {
   renderSubjectDetail(activeSubjectName);
   renderDojo();
   hydrateFilters();
+  hydrateAiControls();
   renderQuestion();
   renderProgress();
   bindEvents();
@@ -99,8 +116,13 @@ function normalizeExercise(exercise) {
     topic: exercise.topic,
     difficulty: exercise.difficulty,
     difficultyLabel: difficultyLabel(exercise.difficulty),
-    question: exercise.question,
+    question: exercise.enhanced_question || exercise.question,
+    originalQuestion: exercise.question,
     solution: exercise.solution,
+    solutionSteps: exercise.solution_steps || [],
+    method: exercise.method || "",
+    learningObjective: exercise.learning_objective || "",
+    qualityNotes: exercise.quality_notes || [],
     marks: exercise.marks || 2,
     community: exercise.autonomous_community || "General España",
     year: exercise.year_reference || "PAU style",
@@ -328,7 +350,12 @@ function renderExerciseViewer(exercise) {
       <span>${exercise.marks} pts</span>
     </div>
     <h3>${exercise.topic}</h3>
+    <p class="learning-objective">${exercise.learningObjective}</p>
     <p class="viewer-question">${exercise.question}</p>
+    <div class="method-box">
+      <strong>Método sugerido</strong>
+      <p>${exercise.method}</p>
+    </div>
     <div class="viewer-context">
       <span>${exercise.community}</span>
       <span>${exercise.year}</span>
@@ -337,7 +364,7 @@ function renderExerciseViewer(exercise) {
     <details open>
       <summary>Solución guiada</summary>
       <ol>
-        ${solutionSteps(exercise.solution).map((step) => `<li>${step}</li>`).join("")}
+        ${(exercise.solutionSteps.length ? exercise.solutionSteps : solutionSteps(exercise.solution)).map((step) => `<li>${step}</li>`).join("")}
       </ol>
       <p>${exercise.solution}</p>
     </details>
@@ -373,6 +400,21 @@ function hydrateFilters() {
   hydrateTopics();
 }
 
+function hydrateAiControls() {
+  const options = subjects.map((subject) => `<option value="${subject.name}">${subject.name}</option>`).join("");
+  tutorSubject.innerHTML = options;
+  aiExamSubject.innerHTML = options;
+  lessonSubject.innerHTML = options;
+  hydrateTopicSelect(tutorSubject, tutorTopic);
+  hydrateTopicSelect(aiExamSubject, aiExamTopic);
+  hydrateTopicSelect(lessonSubject, lessonTopic);
+}
+
+function hydrateTopicSelect(subjectSelect, topicSelect) {
+  const topicSet = new Set(questions.filter((question) => question.subject === subjectSelect.value).map((question) => question.topic));
+  topicSelect.innerHTML = [...topicSet].sort().map((topic) => `<option value="${topic}">${topic}</option>`).join("");
+}
+
 function hydrateTopics() {
   const selected = subjectFilter.value;
   const topicSet = selected === "all"
@@ -406,6 +448,12 @@ function bindEvents() {
   buildMockButton.addEventListener("click", buildMockExam);
   exerciseSearch.addEventListener("input", renderExerciseList);
   dojoDifficulty.addEventListener("change", renderExerciseList);
+  tutorSubject.addEventListener("change", () => hydrateTopicSelect(tutorSubject, tutorTopic));
+  aiExamSubject.addEventListener("change", () => hydrateTopicSelect(aiExamSubject, aiExamTopic));
+  lessonSubject.addEventListener("change", () => hydrateTopicSelect(lessonSubject, lessonTopic));
+  generalTutorButton.addEventListener("click", askGeneralTutor);
+  aiExamButton.addEventListener("click", buildAiExam);
+  lessonButton.addEventListener("click", buildLesson);
 }
 
 function getFilteredQuestions() {
@@ -540,15 +588,108 @@ async function askTutor(exercise) {
   if (!tutor || lastTutorExerciseId !== exercise.id) return;
 
   answerBox.innerHTML = `
+    ${renderTutorOutput(tutor)}
+    <small>${tutor.disclaimer}</small>
+  `;
+}
+
+async function askGeneralTutor() {
+  generalTutorOutput.innerHTML = `<strong>El tutor está preparando una explicación...</strong>`;
+  const tutor = await postJson("/api/tutor", {
+    subject: tutorSubject.value,
+    topic: tutorTopic.value,
+    message: tutorMessage.value
+  });
+
+  generalTutorOutput.innerHTML = tutor ? renderTutorOutput(tutor) : `<strong>No se pudo contactar con el tutor.</strong>`;
+}
+
+async function buildAiExam() {
+  aiExamOutput.innerHTML = `<strong>Generando preguntas nuevas...</strong>`;
+  const exam = await postJson("/api/mock-exam", {
+    subject: aiExamSubject.value,
+    topic: aiExamTopic.value,
+    amount: 5,
+    duration: 90,
+    difficulty: aiExamDifficulty.value,
+    questionType: aiQuestionType.value,
+    generateNew: true
+  });
+
+  aiExamOutput.innerHTML = exam ? renderExamOutput(exam) : `<strong>No se pudo generar el examen.</strong>`;
+}
+
+async function buildLesson() {
+  lessonOutput.innerHTML = `<strong>Creando lección...</strong>`;
+  const lesson = await postJson("/api/lesson", {
+    subject: lessonSubject.value,
+    topic: lessonTopic.value,
+    level: lessonLevel.value
+  });
+
+  if (!lesson) {
+    lessonOutput.innerHTML = `<strong>No se pudo crear la lección.</strong>`;
+    return;
+  }
+
+  lessonOutput.innerHTML = `
+    <h4>${lesson.title}</h4>
+    <p>${lesson.intro}</p>
+    <h5>Ideas clave</h5>
+    <ul>${lesson.keyIdeas.map((idea) => `<li>${idea}</li>`).join("")}</ul>
+    <h5>Ejemplo guiado</h5>
+    <ol>${lesson.guidedExample.map((step) => `<li>${step}</li>`).join("")}</ol>
+    <h5>Mini práctica</h5>
+    <p>${lesson.miniPractice.question}</p>
+    <details>
+      <summary>Ver solución</summary>
+      <p>${lesson.miniPractice.solution}</p>
+    </details>
+  `;
+}
+
+function renderTutorOutput(tutor) {
+  return `
     <strong>${tutor.response}</strong>
-    <h4>Pistas</h4>
+    <h5>Pistas</h5>
     <ul>${tutor.hints.map((hint) => `<li>${hint}</li>`).join("")}</ul>
-    <h4>Pasos</h4>
+    <h5>Pasos</h5>
     <ol>${tutor.steps.map((step) => `<li>${step}</li>`).join("")}</ol>
-    <h4>Errores típicos</h4>
+    <h5>Errores típicos</h5>
     <ul>${tutor.commonMistakes.map((mistake) => `<li>${mistake}</li>`).join("")}</ul>
     <p>${tutor.finalCheck}</p>
-    <small>${tutor.disclaimer}</small>
+  `;
+}
+
+function renderExamOutput(exam) {
+  return `
+    <div class="exam-paper compact">
+      <div class="exam-paper-cover">
+        <span>${exam.id}</span>
+        <h3>${exam.title}</h3>
+        <p>${exam.duration} minutos · ${exam.totalMarks.toFixed(1)} puntos</p>
+      </div>
+      ${exam.sections.map((section, sectionIndex) => `
+        <section class="exam-section">
+          <h4>${section.title}</h4>
+          ${section.questions.map((question, index) => `
+            <article class="exam-question">
+              <strong>${sectionIndex + 1}.${index + 1} · ${question.topic} · ${question.marks} pts</strong>
+              <p>${question.statement}</p>
+            </article>
+          `).join("")}
+        </section>
+      `).join("")}
+      <details class="answer-key">
+        <summary>Soluciones generadas</summary>
+        ${exam.answerKey.map((item) => `
+          <article>
+            <strong>${item.number}. ${item.topic}</strong>
+            <p>${item.solution}</p>
+          </article>
+        `).join("")}
+      </details>
+    </div>
   `;
 }
 

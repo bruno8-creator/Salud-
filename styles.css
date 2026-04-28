@@ -304,6 +304,7 @@ h2 {
 
 .section-shell,
 .dojo-section,
+.ai-section,
 .practice-section,
 .mock-section,
 .assistant-section {
@@ -541,9 +542,92 @@ h2 {
   line-height: 1.65;
 }
 
+.learning-objective {
+  color: var(--blue);
+  font-size: 0.92rem;
+  font-weight: 850;
+  line-height: 1.5;
+}
+
+.method-box {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin: 16px 0;
+  padding: 14px;
+}
+
+.method-box p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 6px 0 0;
+}
+
 .viewer-practice {
   margin-top: 18px;
   width: 100%;
+}
+
+.ai-section {
+  background: #eef3ff;
+}
+
+.ai-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 34px;
+}
+
+.ai-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+}
+
+.ai-card h3 {
+  font-size: 1.55rem;
+  margin-bottom: 4px;
+}
+
+.ai-card textarea {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  padding: 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.ai-output {
+  background: #f8faff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  max-height: 520px;
+  overflow: auto;
+  padding: 16px;
+}
+
+.ai-output:empty {
+  display: none;
+}
+
+.ai-output p,
+.ai-output li,
+.ai-output small {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.ai-output h4,
+.ai-output h5 {
+  margin: 14px 0 8px;
 }
 
 .tutor-box {
@@ -1010,6 +1094,10 @@ meter {
 
   .subject-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ai-grid {
+    grid-template-columns: 1fr;
   }
 
   .assistant-card {

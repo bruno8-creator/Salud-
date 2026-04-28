@@ -25,9 +25,10 @@
       </a>
       <nav class="nav-links" aria-label="Navegación principal">
         <a href="#dojo">Banco</a>
+        <a href="#tutor">Tutor IA</a>
+        <a href="#generador">Generador</a>
+        <a href="#lecciones">Lecciones</a>
         <a href="#asignaturas">Asignaturas</a>
-        <a href="#simulacro">Simulacro</a>
-        <a href="#progreso">Progreso</a>
       </nav>
       <a class="nav-action" href="#dojo">Empezar</a>
     </header>
@@ -135,6 +136,90 @@
           </section>
 
           <aside class="exercise-viewer" id="exerciseViewer"></aside>
+        </div>
+      </section>
+
+      <section class="ai-section" id="tutor">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Tutor IA</p>
+          <h2>Pregunta dudas como si tuvieras un profesor al lado.</h2>
+          <p>
+            El tutor puede darte pistas, explicarte un tema, detectar errores típicos y ayudarte a
+            empezar sin regalarte directamente la respuesta.
+          </p>
+        </div>
+        <div class="ai-grid">
+          <article class="ai-card reveal">
+            <h3>Tutor de dudas</h3>
+            <label>
+              Asignatura
+              <select id="tutorSubject"></select>
+            </label>
+            <label>
+              Tema
+              <select id="tutorTopic"></select>
+            </label>
+            <label>
+              Tu duda
+              <textarea id="tutorMessage" rows="4" placeholder="Ej: no entiendo cómo plantear una integral de área"></textarea>
+            </label>
+            <button class="primary-button" id="generalTutorButton" type="button">Preguntar</button>
+            <div class="ai-output" id="generalTutorOutput"></div>
+          </article>
+
+          <article class="ai-card reveal" id="generador">
+            <h3>Generador de exámenes</h3>
+            <label>
+              Asignatura
+              <select id="aiExamSubject"></select>
+            </label>
+            <label>
+              Tema
+              <select id="aiExamTopic"></select>
+            </label>
+            <label>
+              Tipo de pregunta
+              <select id="aiQuestionType">
+                <option value="problema_guiado">Problema guiado</option>
+                <option value="desarrollo">Desarrollo teórico</option>
+                <option value="comentario">Comentario / explicación</option>
+                <option value="calculo">Cálculo paso a paso</option>
+              </select>
+            </label>
+            <label>
+              Dificultad
+              <select id="aiExamDifficulty">
+                <option value="mixed">Mixta</option>
+                <option value="Fácil">Fácil</option>
+                <option value="Media">Media</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </label>
+            <button class="primary-button" id="aiExamButton" type="button">Generar examen IA</button>
+            <div class="ai-output" id="aiExamOutput"></div>
+          </article>
+
+          <article class="ai-card reveal" id="lecciones">
+            <h3>Lecciones IA</h3>
+            <label>
+              Asignatura
+              <select id="lessonSubject"></select>
+            </label>
+            <label>
+              Tema
+              <select id="lessonTopic"></select>
+            </label>
+            <label>
+              Nivel
+              <select id="lessonLevel">
+                <option value="desde cero">Desde cero</option>
+                <option value="repaso rápido">Repaso rápido</option>
+                <option value="nivel examen">Nivel examen</option>
+              </select>
+            </label>
+            <button class="primary-button" id="lessonButton" type="button">Crear lección</button>
+            <div class="ai-output" id="lessonOutput"></div>
+          </article>
         </div>
       </section>
 

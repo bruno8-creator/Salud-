@@ -33,6 +33,14 @@ La estructura está lista para conectar APIs de:
 - `GET /api/subjects`: listado de asignaturas.
 - `POST /api/mock-exam`: genera un examen PAU completo con bloques, instrucciones y hoja de corrección.
 - `POST /api/tutor`: tutor educativo para pedir pistas, pasos y errores típicos sobre un ejercicio.
+- `POST /api/lesson`: genera una lección por asignatura, tema y nivel.
+
+Módulos frontend añadidos:
+
+- Tutor IA: dudas generales por asignatura/tema y tutor contextual en cada ejercicio.
+- Generador de exámenes: selecciona asignatura, tema, dificultad y tipo de pregunta para crear ejercicios y soluciones.
+- Lecciones IA: explicación, ideas clave, ejemplo guiado y mini práctica.
+- Enriquecimiento de ejercicios: objetivo, método sugerido, pasos y notas de calidad para bases incompletas.
 
 Pendiente para una versión con usuarios:
 
