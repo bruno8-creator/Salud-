@@ -1,102 +1,21 @@
-const subjects = [
+const fallbackExercises = [
   {
-    id: "matematicas-ii",
-    name: "Matemáticas II",
-    accent: "#5d7cff",
-    mastery: 68,
-    topics: ["Matrices", "Derivadas", "Integrales", "Probabilidad"],
-    description: "Álgebra, análisis, geometría y probabilidad con problemas tipo examen."
-  },
-  {
-    id: "lengua",
-    name: "Lengua Castellana",
-    accent: "#ff7a59",
-    mastery: 81,
-    topics: ["Comentario", "Sintaxis", "Literatura", "Argumentación"],
-    description: "Comentario de texto, sintaxis, literatura y escritura argumentativa."
-  },
-  {
-    id: "historia",
-    name: "Historia de España",
-    accent: "#14b87a",
-    mastery: 74,
-    topics: ["Siglo XIX", "Segunda República", "Franquismo", "Transición"],
-    description: "Temas desarrollados, fuentes históricas y esquemas memorizables."
-  },
-  {
-    id: "ingles",
-    name: "Inglés",
-    accent: "#a855f7",
-    mastery: 88,
-    topics: ["Reading", "Writing", "Use of English", "Vocabulary"],
-    description: "Comprensión lectora, redacción, gramática y vocabulario útil."
-  },
-  {
-    id: "fisica",
-    name: "Física",
-    accent: "#00a6c8",
-    mastery: 62,
-    topics: ["Campo gravitatorio", "Ondas", "Electricidad", "Óptica"],
-    description: "Problemas guiados, fórmulas clave y razonamiento físico paso a paso."
-  },
-  {
-    id: "quimica",
-    name: "Química",
-    accent: "#f6b73c",
-    mastery: 71,
-    topics: ["Equilibrio", "Redox", "Ácido-base", "Orgánica"],
-    description: "Ejercicios de cálculo, formulación, equilibrios y reacciones."
-  }
-];
-
-const questions = [
-  {
-    subject: "matematicas-ii",
+    id: "demo-1",
+    subject: "Matemáticas II",
     topic: "Matrices",
-    difficulty: "Media",
-    statement: "Sea A una matriz 3x3 dependiente del parámetro a. Estudia para qué valores de a la matriz tiene rango 2.",
-    steps: ["Calcula el determinante de A.", "Iguala el determinante a cero para encontrar candidatos.", "Comprueba menores de orden 2 para confirmar el rango."],
-    answer: "El rango baja a 2 cuando det(A)=0 y existe al menos un menor de orden 2 no nulo."
+    difficulty: "media",
+    question: "Sea A una matriz 3x3 dependiente del parámetro a. Estudia para qué valores de a la matriz tiene rango 2.",
+    solution: "Calcula el determinante, iguala a cero y comprueba menores de orden 2.",
+    marks: 2.5
   },
   {
-    subject: "lengua",
+    id: "demo-2",
+    subject: "Lengua Castellana y Literatura II",
     topic: "Sintaxis",
-    difficulty: "Fácil",
-    statement: "Analiza sintácticamente: 'Los estudiantes que repasaron con tiempo llegaron tranquilos al examen'.",
-    steps: ["Localiza el verbo principal.", "Identifica el sujeto y la subordinada adjetiva.", "Separa complementos del predicado."],
-    answer: "Sujeto: 'Los estudiantes que repasaron con tiempo'. Predicado: 'llegaron tranquilos al examen'."
-  },
-  {
-    subject: "historia",
-    topic: "Transición",
-    difficulty: "Media",
-    statement: "Explica dos factores que facilitaron la transición democrática en España.",
-    steps: ["Contextualiza tras la muerte de Franco.", "Menciona actores políticos y sociales.", "Relaciona reforma legal y consenso."],
-    answer: "Fueron claves la reforma desde las instituciones y el consenso entre fuerzas políticas y sociales."
-  },
-  {
-    subject: "ingles",
-    topic: "Writing",
-    difficulty: "Fácil",
-    statement: "Write a 120-word opinion paragraph about whether students should work while studying.",
-    steps: ["State your opinion clearly.", "Use two reasons and one example.", "Close with a short conclusion."],
-    answer: "A strong answer uses connectors, clear opinion and specific examples without overcomplicating grammar."
-  },
-  {
-    subject: "fisica",
-    topic: "Ondas",
-    difficulty: "Difícil",
-    statement: "Una onda armónica tiene frecuencia 50 Hz y longitud de onda 0,4 m. Calcula su velocidad y periodo.",
-    steps: ["Usa v = λf.", "Calcula T = 1/f.", "Incluye unidades en ambos resultados."],
-    answer: "v = 0,4 · 50 = 20 m/s. T = 1/50 = 0,02 s."
-  },
-  {
-    subject: "quimica",
-    topic: "Ácido-base",
-    difficulty: "Media",
-    statement: "Calcula el pH de una disolución 0,01 M de HCl suponiendo disociación completa.",
-    steps: ["Identifica que HCl es ácido fuerte.", "Calcula [H+] = 0,01 M.", "Aplica pH = -log[H+]."],
-    answer: "pH = -log(10^-2) = 2."
+    difficulty: "baja",
+    question: "Analiza sintácticamente: 'Los estudiantes que repasaron con tiempo llegaron tranquilos al examen'.",
+    solution: "Sujeto: 'Los estudiantes que repasaron con tiempo'. Predicado: 'llegaron tranquilos al examen'.",
+    marks: 2
   }
 ];
 
@@ -113,12 +32,15 @@ const buildMockButton = document.querySelector("#buildMockButton");
 const mockResult = document.querySelector("#mockResult");
 const progressList = document.querySelector("#progressList");
 
+let subjects = [];
+let questions = [];
 let activeQuestionIndex = 0;
 
 init();
 
-function init() {
+async function init() {
   setupReveal();
+  await loadExerciseDatabase();
   renderSubjects();
   hydrateFilters();
   renderQuestion();
@@ -142,13 +64,70 @@ function setupReveal() {
   document.querySelectorAll(".reveal").forEach((item) => observer.observe(item));
 }
 
+async function loadExerciseDatabase() {
+  try {
+    const response = await fetch("/api/exercises");
+    if (!response.ok) throw new Error("No exercise API");
+    const payload = await response.json();
+    questions = payload.exercises.map(normalizeExercise);
+  } catch {
+    questions = fallbackExercises.map(normalizeExercise);
+  }
+
+  subjects = buildSubjectsFromExercises(questions);
+}
+
+function normalizeExercise(exercise) {
+  return {
+    id: exercise.id,
+    subject: exercise.subject,
+    topic: exercise.topic,
+    difficulty: exercise.difficulty,
+    difficultyLabel: difficultyLabel(exercise.difficulty),
+    question: exercise.question,
+    solution: exercise.solution,
+    marks: exercise.marks || 2,
+    community: exercise.autonomous_community || "General España",
+    year: exercise.year_reference || "PAU style",
+    tags: exercise.tags || []
+  };
+}
+
+function buildSubjectsFromExercises(items) {
+  const accents = ["#5d7cff", "#ff7a59", "#14b87a", "#a855f7", "#00a6c8", "#f6b73c", "#ec4899", "#10b981", "#f97316", "#6366f1"];
+  const grouped = new Map();
+
+  items.forEach((item) => {
+    if (!grouped.has(item.subject)) {
+      grouped.set(item.subject, {
+        id: slugify(item.subject),
+        name: item.subject,
+        accent: accents[grouped.size % accents.length],
+        mastery: 58 + ((grouped.size * 7) % 34),
+        topics: new Set(),
+        count: 0
+      });
+    }
+
+    const subject = grouped.get(item.subject);
+    subject.topics.add(item.topic);
+    subject.count += 1;
+  });
+
+  return [...grouped.values()].map((subject) => ({
+    ...subject,
+    topics: [...subject.topics].slice(0, 8),
+    description: `${subject.count} ejercicios originales tipo PAU con temas filtrables y solución guiada.`
+  }));
+}
+
 function renderSubjects() {
   subjectGrid.innerHTML = subjects
     .map(
       (subject) => `
         <article class="subject-card reveal" style="--accent:${subject.accent}">
           <div class="subject-top">
-            <span>${subject.mastery}% dominio</span>
+            <span>${subject.count} ejercicios · ${subject.mastery}% dominio</span>
             <strong>${subject.name}</strong>
           </div>
           <p>${subject.description}</p>
@@ -166,7 +145,7 @@ function renderSubjects() {
 }
 
 function hydrateFilters() {
-  const options = subjects.map((subject) => `<option value="${subject.id}">${subject.name}</option>`).join("");
+  const options = subjects.map((subject) => `<option value="${subject.name}">${subject.name}</option>`).join("");
   subjectFilter.innerHTML = `<option value="all">Todas</option>${options}`;
   mockSubject.innerHTML = options;
   hydrateTopics();
@@ -175,10 +154,10 @@ function hydrateFilters() {
 function hydrateTopics() {
   const selected = subjectFilter.value;
   const topicSet = selected === "all"
-    ? new Set(subjects.flatMap((subject) => subject.topics))
-    : new Set(subjects.find((subject) => subject.id === selected).topics);
+    ? new Set(questions.map((question) => question.topic))
+    : new Set(questions.filter((question) => question.subject === selected).map((question) => question.topic));
 
-  topicFilter.innerHTML = `<option value="all">Todos</option>${[...topicSet].map((topic) => `<option value="${topic}">${topic}</option>`).join("")}`;
+  topicFilter.innerHTML = `<option value="all">Todos</option>${[...topicSet].sort().map((topic) => `<option value="${topic}">${topic}</option>`).join("")}`;
 }
 
 function bindEvents() {
@@ -187,8 +166,14 @@ function bindEvents() {
     activeQuestionIndex = 0;
     renderQuestion();
   });
-  topicFilter.addEventListener("change", renderQuestion);
-  difficultyFilter.addEventListener("change", renderQuestion);
+  topicFilter.addEventListener("change", () => {
+    activeQuestionIndex = 0;
+    renderQuestion();
+  });
+  difficultyFilter.addEventListener("change", () => {
+    activeQuestionIndex = 0;
+    renderQuestion();
+  });
   newQuestionButton.addEventListener("click", () => {
     activeQuestionIndex += 1;
     renderQuestion();
@@ -207,23 +192,39 @@ function getFilteredQuestions() {
   return questions.filter((question) => {
     const subjectMatch = selectedSubject === "all" || question.subject === selectedSubject;
     const topicMatch = selectedTopic === "all" || question.topic === selectedTopic;
-    const difficultyMatch = selectedDifficulty === "all" || question.difficulty === selectedDifficulty;
+    const difficultyMatch = selectedDifficulty === "all" || question.difficultyLabel === selectedDifficulty;
     return subjectMatch && topicMatch && difficultyMatch;
   });
 }
 
 function renderQuestion() {
   const pool = getFilteredQuestions();
-  const question = pool[activeQuestionIndex % pool.length] || questions[0];
-  const subject = subjects.find((item) => item.id === question.subject);
+
+  if (!pool.length) {
+    questionCard.innerHTML = `
+      <div class="empty-state">
+        <h3>No hay ejercicios con esos filtros.</h3>
+        <p>Prueba otra asignatura, tema o dificultad.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const question = pool[activeQuestionIndex % pool.length];
 
   questionCard.innerHTML = `
     <div class="question-meta">
-      <span>${subject.name}</span>
+      <span>${question.subject}</span>
       <span>${question.topic}</span>
-      <span>${question.difficulty}</span>
+      <span>${question.difficultyLabel}</span>
+      <span>${question.marks} pts</span>
     </div>
-    <h3>${question.statement}</h3>
+    <h3>${question.question}</h3>
+    <div class="exam-context">
+      <span>${question.community}</span>
+      <span>${question.year}</span>
+      <span>${question.id}</span>
+    </div>
     <div class="work-area">
       <span></span>
       <span></span>
@@ -233,44 +234,71 @@ function renderQuestion() {
     <details>
       <summary>Ver solución paso a paso</summary>
       <ol>
-        ${question.steps.map((step) => `<li>${step}</li>`).join("")}
+        ${solutionSteps(question.solution).map((step) => `<li>${step}</li>`).join("")}
       </ol>
-      <strong>Respuesta:</strong>
-      <p>${question.answer}</p>
+      <strong>Guía de corrección:</strong>
+      <p>${question.solution}</p>
     </details>
   `;
 }
 
 function buildMockExam() {
-  const subject = subjects.find((item) => item.id === mockSubject.value);
+  const subjectName = mockSubject.value;
   const amount = Number(mockQuestions.value);
   const time = document.querySelector("#mockTime").value;
   const selectedQuestions = questions
-    .filter((question) => question.subject === subject.id)
-    .concat(questions)
+    .filter((question) => question.subject === subjectName)
     .slice(0, amount);
 
   mockResult.innerHTML = `
-    <strong>${subject.name} · ${time} minutos</strong>
-    <p>${amount} ejercicios seleccionados con dificultad mezclada.</p>
+    <strong>${subjectName} · ${time} minutos</strong>
+    <p>${selectedQuestions.length} ejercicios seleccionados desde la base PAU.</p>
     <ul>
-      ${selectedQuestions.map((question) => `<li>${question.topic}: ${question.difficulty}</li>`).join("")}
+      ${selectedQuestions.map((question) => `<li>${question.topic}: ${question.difficultyLabel} · ${question.marks} pts</li>`).join("")}
     </ul>
   `;
 }
 
 function renderProgress() {
   progressList.innerHTML = subjects
+    .slice(0, 8)
     .map(
       (subject) => `
         <div class="progress-item" style="--accent:${subject.accent}">
           <div>
             <strong>${subject.name}</strong>
-            <span>${subject.mastery}% dominio</span>
+            <span>${subject.count} ejercicios</span>
           </div>
           <meter min="0" max="100" value="${subject.mastery}"></meter>
         </div>
       `
     )
     .join("");
+}
+
+function difficultyLabel(value) {
+  const map = {
+    baja: "Fácil",
+    media: "Media",
+    alta: "Difícil"
+  };
+
+  return map[String(value).toLowerCase()] || value;
+}
+
+function solutionSteps(solution) {
+  return String(solution)
+    .split(/(?<=[.!?])\s+/)
+    .map((step) => step.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+}
+
+function slugify(value) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }

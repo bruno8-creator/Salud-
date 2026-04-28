@@ -4,10 +4,21 @@ const path = require("path");
 
 const PORT = Number(process.env.PORT) || 5173;
 const ROOT = __dirname;
+const DATABASE_PATH = path.join(ROOT, "data", "pau_exercises_500.json");
+const exerciseDatabase = loadExerciseDatabase();
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const staticExtensions = [".css", ".js", ".svg", ".png", ".jpg", ".jpeg", ".webp"];
+
+  if (url.pathname === "/api/exercises") {
+    return sendJson(res, exerciseDatabase);
+  }
+
+  if (url.pathname === "/api/subjects") {
+    const subjects = [...new Set(exerciseDatabase.exercises.map((exercise) => exercise.subject))];
+    return sendJson(res, { subjects });
+  }
 
   if (staticExtensions.includes(path.extname(url.pathname))) {
     return serveStatic(url.pathname, res);
@@ -40,6 +51,25 @@ function serveStatic(requestPath, res) {
     res.writeHead(200, { "Content-Type": getContentType(filePath) });
     res.end(content);
   });
+}
+
+function loadExerciseDatabase() {
+  try {
+    return JSON.parse(fs.readFileSync(DATABASE_PATH, "utf8"));
+  } catch {
+    return {
+      metadata: {
+        name: "Fallback PAU exercise database",
+        total_exercises: 0
+      },
+      exercises: []
+    };
+  }
+}
+
+function sendJson(res, data) {
+  res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+  res.end(JSON.stringify(data));
 }
 
 function getContentType(filePath) {

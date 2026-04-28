@@ -7,6 +7,7 @@ Frontend para una plataforma de repaso PAU/EBAU inspirada en productos tipo Revi
 - Landing premium enfocada en práctica de examen.
 - Dashboard de asignaturas y dominio.
 - Banco de preguntas filtrable por asignatura, tema y dificultad.
+- Base local de 500 ejercicios originales tipo PAU desde `data/pau_exercises_500.json`.
 - Soluciones paso a paso.
 - Generador visual de simulacros PAU.
 - Panel de progreso y plan de estudio diario.
@@ -35,3 +36,16 @@ La estructura está lista para conectar APIs de:
 - Intentos
 - Simulacros
 - Progreso
+
+## Datos incluidos
+
+La carpeta `data/` contiene:
+
+- `pau_exercises_500.json`: 500 ejercicios originales tipo PAU.
+- `README_SCHEMA.md`: descripción del esquema de datos.
+
+El frontend carga los ejercicios desde:
+
+```text
+GET /api/exercises
+```
