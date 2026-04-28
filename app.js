@@ -39,6 +39,7 @@ const mockOutput = document.querySelector("#mockOutput");
 const buildMockButton = document.querySelector("#buildMockButton");
 const mockResult = document.querySelector("#mockResult");
 const progressList = document.querySelector("#progressList");
+let lastTutorExerciseId = "";
 
 let subjects = [];
 let questions = [];
@@ -340,9 +341,19 @@ function renderExerciseViewer(exercise) {
       </ol>
       <p>${exercise.solution}</p>
     </details>
+    <div class="tutor-box">
+      <div>
+        <strong>Tutor IA</strong>
+        <p>Pide una pista, una explicación más sencilla o una forma de empezar.</p>
+      </div>
+      <textarea id="tutorPrompt" rows="3" placeholder="Ej: explícame el primer paso sin darme la respuesta"></textarea>
+      <button class="primary-button" type="button" id="askTutor">Preguntar al tutor</button>
+      <div class="tutor-answer" id="tutorAnswer"></div>
+    </div>
     <button class="primary-button viewer-practice" type="button" id="sendToPractice">Practicar en grande</button>
   `;
 
+  exerciseViewer.querySelector("#askTutor").addEventListener("click", () => askTutor(exercise));
   exerciseViewer.querySelector("#sendToPractice").addEventListener("click", () => {
     subjectFilter.value = exercise.subject;
     hydrateTopics();
@@ -455,21 +466,104 @@ function renderQuestion() {
   `;
 }
 
-function buildMockExam() {
+async function buildMockExam() {
   const subjectName = mockSubject.value;
   const amount = Number(mockQuestions.value);
   const time = document.querySelector("#mockTime").value;
-  const selectedQuestions = questions
-    .filter((question) => question.subject === subjectName)
-    .slice(0, amount);
+  mockResult.innerHTML = `
+    <strong>Creando examen...</strong>
+    <p>Seleccionando preguntas, bloques y hoja de corrección.</p>
+  `;
+
+  const exam = await postJson("/api/mock-exam", {
+    subject: subjectName,
+    amount,
+    duration: Number(time),
+    difficulty: "mixed"
+  });
+
+  if (!exam) {
+    mockResult.innerHTML = `
+      <strong>No se pudo crear el simulacro.</strong>
+      <p>Revisa que el backend esté encendido y vuelve a intentarlo.</p>
+    `;
+    return;
+  }
 
   mockResult.innerHTML = `
-    <strong>${subjectName} · ${time} minutos</strong>
-    <p>${selectedQuestions.length} ejercicios seleccionados desde la base PAU.</p>
-    <ul>
-      ${selectedQuestions.map((question) => `<li>${question.topic}: ${question.difficultyLabel} · ${question.marks} pts</li>`).join("")}
-    </ul>
+    <div class="exam-paper">
+      <div class="exam-paper-cover">
+        <span>${exam.id}</span>
+        <h3>${exam.title}</h3>
+        <p>${exam.duration} minutos · ${exam.totalMarks.toFixed(1)} puntos</p>
+      </div>
+      <div class="exam-instructions">
+        <strong>Instrucciones</strong>
+        <ol>${exam.instructions.map((item) => `<li>${item}</li>`).join("")}</ol>
+      </div>
+      ${exam.sections.map((section, sectionIndex) => `
+        <section class="exam-section">
+          <h4>${section.title}</h4>
+          ${section.questions.map((question, index) => `
+            <article class="exam-question">
+              <strong>${sectionIndex + 1}.${index + 1} · ${question.topic} · ${question.marks} pts</strong>
+              <p>${question.statement}</p>
+            </article>
+          `).join("")}
+        </section>
+      `).join("")}
+      <details class="answer-key">
+        <summary>Ver hoja de corrección</summary>
+        ${exam.answerKey.map((item) => `
+          <article>
+            <strong>${item.number}. ${item.topic} · ${item.marks} pts</strong>
+            <p>${item.solution}</p>
+            <ul>${item.rubric.map((line) => `<li>${line}</li>`).join("")}</ul>
+          </article>
+        `).join("")}
+      </details>
+    </div>
   `;
+}
+
+async function askTutor(exercise) {
+  const answerBox = exerciseViewer.querySelector("#tutorAnswer");
+  const prompt = exerciseViewer.querySelector("#tutorPrompt").value;
+  lastTutorExerciseId = exercise.id;
+  answerBox.innerHTML = `<strong>El tutor está pensando...</strong>`;
+
+  const tutor = await postJson("/api/tutor", {
+    exerciseId: exercise.id,
+    message: prompt
+  });
+
+  if (!tutor || lastTutorExerciseId !== exercise.id) return;
+
+  answerBox.innerHTML = `
+    <strong>${tutor.response}</strong>
+    <h4>Pistas</h4>
+    <ul>${tutor.hints.map((hint) => `<li>${hint}</li>`).join("")}</ul>
+    <h4>Pasos</h4>
+    <ol>${tutor.steps.map((step) => `<li>${step}</li>`).join("")}</ol>
+    <h4>Errores típicos</h4>
+    <ul>${tutor.commonMistakes.map((mistake) => `<li>${mistake}</li>`).join("")}</ul>
+    <p>${tutor.finalCheck}</p>
+    <small>${tutor.disclaimer}</small>
+  `;
+}
+
+async function postJson(path, payload) {
+  try {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error("Request failed");
+    return await response.json();
+  } catch {
+    return null;
+  }
 }
 
 function renderProgress() {

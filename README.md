@@ -29,13 +29,18 @@ http://127.0.0.1:5173/
 
 La estructura está lista para conectar APIs de:
 
-- Usuarios
-- Asignaturas
-- Preguntas
-- Soluciones
-- Intentos
-- Simulacros
-- Progreso
+- `GET /api/exercises`: ejercicios con filtros por asignatura, tema, dificultad, búsqueda y límite.
+- `GET /api/subjects`: listado de asignaturas.
+- `POST /api/mock-exam`: genera un examen PAU completo con bloques, instrucciones y hoja de corrección.
+- `POST /api/tutor`: tutor educativo para pedir pistas, pasos y errores típicos sobre un ejercicio.
+
+Pendiente para una versión con usuarios:
+
+- Usuarios y sesiones
+- Guardado de intentos
+- Historial de simulacros
+- Progreso real por tema
+- Tutor IA conectado a modelo externo
 
 ## Datos incluidos
 
