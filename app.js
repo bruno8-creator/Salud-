@@ -20,6 +20,7 @@ const fallbackExercises = [
 ];
 
 const subjectGrid = document.querySelector("#subjectGrid");
+const subjectDetail = document.querySelector("#subjectDetail");
 const subjectFilter = document.querySelector("#subjectFilter");
 const topicFilter = document.querySelector("#topicFilter");
 const difficultyFilter = document.querySelector("#difficultyFilter");
@@ -35,6 +36,7 @@ const progressList = document.querySelector("#progressList");
 let subjects = [];
 let questions = [];
 let activeQuestionIndex = 0;
+let activeSubjectName = "";
 
 init();
 
@@ -42,6 +44,8 @@ async function init() {
   setupReveal();
   await loadExerciseDatabase();
   renderSubjects();
+  activeSubjectName = subjects[0]?.name || "";
+  renderSubjectDetail(activeSubjectName);
   hydrateFilters();
   renderQuestion();
   renderProgress();
@@ -125,7 +129,7 @@ function renderSubjects() {
   subjectGrid.innerHTML = subjects
     .map(
       (subject) => `
-        <article class="subject-card reveal" style="--accent:${subject.accent}">
+        <button class="subject-card reveal" style="--accent:${subject.accent}" data-subject="${subject.name}" type="button">
           <div class="subject-top">
             <span>${subject.count} ejercicios · ${subject.mastery}% dominio</span>
             <strong>${subject.name}</strong>
@@ -134,14 +138,77 @@ function renderSubjects() {
           <div class="topic-tags">
             ${subject.topics.map((topic) => `<span>${topic}</span>`).join("")}
           </div>
-        </article>
+        </button>
       `
     )
     .join("");
 
+  subjectGrid.querySelectorAll(".subject-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      activeSubjectName = card.dataset.subject;
+      renderSubjectDetail(activeSubjectName);
+      subjectFilter.value = activeSubjectName;
+      hydrateTopics();
+      activeQuestionIndex = 0;
+      renderQuestion();
+      document.querySelector("#practica").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
   setTimeout(() => {
     document.querySelectorAll(".subject-card").forEach((card) => card.classList.add("is-visible"));
   }, 80);
+}
+
+function renderSubjectDetail(subjectName) {
+  const subject = subjects.find((item) => item.name === subjectName);
+  if (!subject) return;
+
+  const subjectQuestions = questions.filter((question) => question.subject === subjectName);
+  const groupedTopics = subjectQuestions.reduce((acc, question) => {
+    acc[question.topic] = (acc[question.topic] || 0) + 1;
+    return acc;
+  }, {});
+
+  subjectDetail.innerHTML = `
+    <div class="subject-detail-header" style="--accent:${subject.accent}">
+      <div>
+        <p class="eyebrow">Ejercicios de la asignatura</p>
+        <h3>${subject.name}</h3>
+        <p>${subject.count} ejercicios disponibles, organizados por temas PAU y dificultad.</p>
+      </div>
+      <button class="primary-button" id="practiceSubjectButton" type="button">Practicar ${subject.name}</button>
+    </div>
+    <div class="topic-summary">
+      ${Object.entries(groupedTopics)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 12)
+        .map(([topic, count]) => `<span>${topic} · ${count}</span>`)
+        .join("")}
+    </div>
+    <div class="subject-exercise-list">
+      ${subjectQuestions
+        .slice(0, 10)
+        .map((question) => `
+          <article>
+            <div>
+              <strong>${question.topic}</strong>
+              <p>${question.question}</p>
+            </div>
+            <span>${question.difficultyLabel} · ${question.marks} pts</span>
+          </article>
+        `)
+        .join("")}
+    </div>
+  `;
+
+  subjectDetail.querySelector("#practiceSubjectButton").addEventListener("click", () => {
+    subjectFilter.value = subject.name;
+    hydrateTopics();
+    activeQuestionIndex = 0;
+    renderQuestion();
+    document.querySelector("#practica").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 function hydrateFilters() {
