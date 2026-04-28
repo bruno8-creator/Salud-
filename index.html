@@ -1,263 +1,218 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{META_TITLE}}</title>
-    <meta name="description" content="{{META_DESCRIPTION}}" />
-    <meta name="robots" content="index,follow" />
-    <meta property="og:title" content="{{META_TITLE}}" />
-    <meta property="og:description" content="{{META_DESCRIPTION}}" />
-    <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#07130f" />
-    <link rel="canonical" href="{{CANONICAL_URL}}" />
+    <title>PAU Mastery | Practica la PAU con ejercicios tipo examen</title>
+    <meta
+      name="description"
+      content="Plataforma de repaso PAU con ejercicios tipo examen, simulacros, soluciones paso a paso, progreso y rutas de estudio."
+    />
+    <meta name="theme-color" content="#0b1020" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "MoneyNova",
-        "url": "{{CANONICAL_URL}}",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "{{CANONICAL_URL}}?q={search_term_string}",
-          "query-input": "required name=search_term_string"
-        }
-      }
-    </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Can MoneyNova tell me if a stock is risky?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "MoneyNova's analyzer reviews recent market data such as trend, volatility and drawdown to create an educational risk snapshot. It is not financial advice."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Does MoneyNova provide financial advice?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No. MoneyNova is educational content and tooling only. Always do your own research and consider a licensed financial advisor."
-            }
-          }
-        ]
-      }
-    </script>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header class="site-header">
-      <a class="brand" href="/" aria-label="MoneyNova home">
-        <img src="/assets/moneynova-logo.svg" alt="" />
-        <span>MoneyNova</span>
+    <header class="app-header">
+      <a class="brand" href="#inicio" aria-label="PAU Mastery inicio">
+        <img src="/assets/pau-mastery-logo.svg" alt="" />
+        <span>PAU Mastery</span>
       </a>
-      <nav class="nav-links" aria-label="Main navigation">
-        <a href="#make-money">Make Money</a>
-        <a href="#tools">Tools</a>
-        <a href="#stock-bot">Stock Bot</a>
-        <a href="#articles">Blog</a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#asignaturas">Asignaturas</a>
+        <a href="#practica">Práctica</a>
+        <a href="#simulacro">Simulacro</a>
+        <a href="#progreso">Progreso</a>
       </nav>
-      <div class="header-actions">
-        <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
-        <a class="nav-action" href="#newsletter">Join free</a>
-      </div>
+      <a class="nav-action" href="#practica">Empezar</a>
     </header>
 
     <main>
-      <section class="hero" id="home">
+      <section class="hero" id="inicio">
         <div class="hero-content reveal">
-          <p class="eyebrow">Money guides, tools and market signals</p>
-          <h1>Make More Money. Build Your Future.</h1>
-          <p class="hero-copy">
-            Discover proven ways to earn money online, side hustles, investing basics, saving
-            strategies and financial tools designed for young adults, students and builders.
+          <p class="eyebrow">Prepárate para la PAU sin perderte</p>
+          <h1>Practica como en el examen. Aprende como si tuvieras un tutor.</h1>
+          <p>
+            Banco de preguntas tipo PAU, soluciones paso a paso, simulacros por tiempo y un panel
+            de progreso para saber exactamente qué repasar antes del examen.
           </p>
           <div class="hero-actions">
-            <a class="primary-button" href="#articles">Start Learning</a>
-            <a class="ghost-button" href="#tools">Explore Tools</a>
-          </div>
-          <div class="trust-row" aria-label="MoneyNova highlights">
-            <span>Evergreen SEO content</span>
-            <span>AdSense-ready layout</span>
-            <span>Affiliate-friendly sections</span>
+            <a class="primary-button" href="#practica">Resolver ejercicios</a>
+            <a class="ghost-button" href="#simulacro">Crear simulacro</a>
           </div>
         </div>
 
-        <aside class="hero-dashboard reveal" aria-label="Financial dashboard preview">
-          <div class="dashboard-top">
-            <span>Income map</span>
-            <strong>+42%</strong>
+        <aside class="exam-panel reveal" aria-label="Vista previa de examen PAU">
+          <div class="exam-top">
+            <span>Simulacro PAU</span>
+            <strong>01:28:00</strong>
           </div>
-          <div class="chart-card" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span><span></span>
-          </div>
-          <div class="mini-grid">
-            <div>
-              <small>Side hustle</small>
-              <strong>€1,280</strong>
-            </div>
-            <div>
-              <small>Savings goal</small>
-              <strong>68%</strong>
+          <div class="question-preview">
+            <small>Matemáticas II · Álgebra</small>
+            <h2>Determina el rango de la matriz según el parámetro a.</h2>
+            <div class="answer-lines">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
           </div>
-          <div class="market-ticker">
-            <span>AI income ideas</span>
-            <span>Budget tools</span>
-            <span>Stock risk bot</span>
+          <div class="score-strip">
+            <div><strong>8.4</strong><span>media actual</span></div>
+            <div><strong>73%</strong><span>dominio</span></div>
+            <div><strong>42</strong><span>ejercicios</span></div>
           </div>
         </aside>
       </section>
 
-      <section class="search-strip reveal">
-        <label for="siteSearch">Search MoneyNova</label>
-        <input id="siteSearch" type="search" placeholder="Search articles, tools, side hustles..." />
-        <span id="searchCount">50+ guides and tools</span>
+      <section class="stats-row" aria-label="Resumen de plataforma">
+        <div class="reveal">
+          <strong>1.200+</strong>
+          <span>preguntas tipo PAU</span>
+        </div>
+        <div class="reveal">
+          <strong>16</strong>
+          <span>asignaturas y bloques</span>
+        </div>
+        <div class="reveal">
+          <strong>90</strong>
+          <span>simulacros guiados</span>
+        </div>
+        <div class="reveal">
+          <strong>100%</strong>
+          <span>enfoque examen</span>
+        </div>
       </section>
 
-      <article class="article-detail" id="articleDetail" hidden></article>
-
-      <section class="category-section" id="make-money">
+      <section class="section-shell" id="asignaturas">
         <div class="section-heading reveal">
-          <p class="eyebrow">Ways to make money</p>
-          <h2>Find realistic opportunities online and offline.</h2>
+          <p class="eyebrow">Asignaturas</p>
+          <h2>Todo organizado por temario, dificultad y tipo de pregunta.</h2>
           <p>
-            A clean content structure built for organic traffic: categories, evergreen articles,
-            trending posts and related content paths.
+            Elige una asignatura y entra directamente en bloques tipo PAU: teoría mínima,
+            ejercicios clave, vídeos cortos y soluciones explicadas.
           </p>
         </div>
-        <div class="category-grid" id="categoryGrid"></div>
+        <div class="subject-grid" id="subjectGrid"></div>
       </section>
 
-      <section class="tools-section" id="tools">
+      <section class="practice-section" id="practica">
         <div class="section-heading reveal">
-          <p class="eyebrow">Useful money tools</p>
-          <h2>Calculators people actually search for.</h2>
+          <p class="eyebrow">Práctica inteligente</p>
+          <h2>Filtra ejercicios como en una plataforma premium de revisión.</h2>
           <p>
-            Compound interest, savings goals, debt payoff, salary conversion, side hustle profit
-            and budget planning. Built to rank and keep users engaged.
+            Selecciona asignatura, tema y dificultad. Luego abre la solución paso a paso cuando
+            hayas intentado resolverlo.
           </p>
         </div>
-        <div class="tool-layout">
-          <div class="tool-tabs" id="toolTabs"></div>
-          <div class="calculator-panel reveal" id="calculatorPanel"></div>
+
+        <div class="practice-layout">
+          <aside class="filter-panel reveal">
+            <label>
+              Asignatura
+              <select id="subjectFilter"></select>
+            </label>
+            <label>
+              Tema
+              <select id="topicFilter"></select>
+            </label>
+            <label>
+              Dificultad
+              <select id="difficultyFilter">
+                <option value="all">Todas</option>
+                <option value="Fácil">Fácil</option>
+                <option value="Media">Media</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </label>
+            <button class="primary-button" id="newQuestionButton" type="button">Nueva pregunta</button>
+          </aside>
+
+          <article class="question-card reveal" id="questionCard"></article>
         </div>
       </section>
 
-      <section class="bot-section" id="stock-bot">
-        <div class="bot-copy reveal">
-          <p class="eyebrow">Market risk bot</p>
-          <h2>Ask if a stock looks risky, balanced or strong.</h2>
+      <section class="mock-section" id="simulacro">
+        <div class="mock-copy reveal">
+          <p class="eyebrow">Modo examen</p>
+          <h2>Genera un simulacro PAU en segundos.</h2>
           <p>
-            Enter a ticker like AAPL, MSFT, TSLA or NVDA. The backend checks recent market data,
-            trend, volatility and drawdown, then returns an educational risk snapshot.
-          </p>
-          <p class="disclaimer">
-            Educational only. This is not financial advice, a buy/sell signal or a guarantee of
-            future performance.
+            El frontend ya tiene el flujo preparado: duración, asignatura, número de ejercicios,
+            bloques y estimación de nota. Luego conectamos el backend para guardar intentos reales.
           </p>
         </div>
-        <div class="bot-card reveal">
-          <form id="stockForm" class="stock-form">
-            <label for="stockSymbol">Company ticker</label>
-            <div class="stock-input-row">
-              <input id="stockSymbol" autocomplete="off" placeholder="AAPL" maxlength="12" />
-              <button class="primary-button" type="submit">Analyze</button>
-            </div>
-          </form>
-          <div id="stockResult" class="stock-result empty">
-            <strong>MoneyNova Bot is ready.</strong>
-            <p>Try AAPL, MSFT, TSLA, NVDA, AMZN or any listed ticker.</p>
+        <div class="mock-builder reveal">
+          <label>
+            Asignatura
+            <select id="mockSubject"></select>
+          </label>
+          <label>
+            Duración
+            <select id="mockTime">
+              <option value="90">90 minutos</option>
+              <option value="75">75 minutos</option>
+              <option value="60">60 minutos</option>
+            </select>
+          </label>
+          <label>
+            Ejercicios
+            <input id="mockQuestions" type="range" min="3" max="8" value="5" />
+            <output id="mockOutput">5 ejercicios</output>
+          </label>
+          <button class="primary-button" id="buildMockButton" type="button">Crear simulacro</button>
+          <div class="mock-result" id="mockResult">
+            <strong>Tu simulacro aparecerá aquí.</strong>
+            <p>Configura la prueba y genera una sesión tipo examen.</p>
           </div>
         </div>
       </section>
 
-      <section class="articles-section" id="articles">
+      <section class="section-shell progress-section" id="progreso">
         <div class="section-heading reveal">
-          <p class="eyebrow">Featured articles</p>
-          <h2>Evergreen posts ready for SEO growth.</h2>
+          <p class="eyebrow">Progreso</p>
+          <h2>Un panel que te dice qué estudiar hoy.</h2>
           <p>
-            The backend ships 50 article ideas, featured content, trending posts and SEO-friendly
-            routes such as /make-money-online and /compound-interest-calculator.
+            Vista de dominio por asignatura, puntos débiles, racha, objetivo semanal y calendario
+            de repaso para llegar al examen con menos caos.
           </p>
         </div>
-        <div class="content-layout">
-          <div class="article-grid" id="articleGrid"></div>
-          <aside class="sidebar">
-            <div class="ad-slot">AdSense placement</div>
-            <div class="trend-card">
-              <h3>Trending</h3>
-              <ol id="trendingList"></ol>
-            </div>
-          </aside>
+        <div class="progress-layout">
+          <div class="progress-card reveal">
+            <div class="progress-ring" aria-label="Dominio global">76%</div>
+            <h3>Dominio global</h3>
+            <p>Buen ritmo. Tu próximo foco debería ser Matemáticas II y comentarios de texto.</p>
+          </div>
+          <div class="progress-list reveal" id="progressList"></div>
+          <div class="study-plan reveal">
+            <h3>Plan de hoy</h3>
+            <ol>
+              <li>20 min · Repaso de matrices</li>
+              <li>35 min · 3 ejercicios de probabilidad</li>
+              <li>25 min · Comentario de texto guiado</li>
+              <li>10 min · Revisión de errores</li>
+            </ol>
+          </div>
         </div>
       </section>
 
-      <section class="stories-section">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Success stories</p>
-          <h2>Simple stories that make money feel possible.</h2>
-        </div>
-        <div class="story-grid">
-          <article class="story-card reveal">
-            <span>Student</span>
-            <h3>Maya built a €600/month design side hustle.</h3>
-            <p>She used freelance marketplaces, a simple portfolio and weekly outreach.</p>
-          </article>
-          <article class="story-card reveal">
-            <span>Creator</span>
-            <h3>Leo turned AI workflows into templates.</h3>
-            <p>He packaged repeatable prompts and sold them as digital products.</p>
-          </article>
-          <article class="story-card reveal">
-            <span>Beginner investor</span>
-            <h3>Sofia automated her first €10,000 goal.</h3>
-            <p>She combined a budget calculator, savings targets and monthly ETFs research.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="newsletter-section" id="newsletter">
-        <div class="newsletter-card reveal">
-          <p class="eyebrow">Free newsletter</p>
-          <h2>Join 10,000+ people improving their finances.</h2>
-          <form id="newsletterForm">
-            <input type="email" placeholder="you@example.com" required />
-            <button class="primary-button" type="submit">Join free</button>
-          </form>
-          <small>No spam. Just practical money ideas, tools and weekly opportunities.</small>
+      <section class="assistant-section">
+        <div class="assistant-card reveal">
+          <div>
+            <p class="eyebrow">Próximo paso</p>
+            <h2>Luego añadimos el backend y un tutor IA.</h2>
+            <p>
+              La estructura ya está pensada para API: preguntas, usuarios, intentos, soluciones,
+              progreso y simulacros. Tú me ayudas con las reglas y yo lo conecto.
+            </p>
+          </div>
+          <a class="primary-button" href="#practica">Probar una pregunta</a>
         </div>
       </section>
     </main>
-
-    <footer class="site-footer">
-      <div>
-        <a class="brand footer-brand" href="/">
-          <img src="/assets/moneynova-logo.svg" alt="" />
-          <span>MoneyNova</span>
-        </a>
-        <p>Modern money education for earning, saving and investing smarter.</p>
-      </div>
-      <nav aria-label="Footer">
-        <a href="/about">About Us</a>
-        <a href="/contact">Contact</a>
-        <a href="/privacy-policy">Privacy Policy</a>
-        <a href="/terms">Terms</a>
-        <a href="/disclaimer">Disclaimer</a>
-        <a href="/sitemap.xml">Sitemap</a>
-      </nav>
-    </footer>
 
     <script src="/app.js"></script>
   </body>

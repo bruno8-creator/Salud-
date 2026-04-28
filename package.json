@@ -1,18 +1,18 @@
 {
-  "name": "moneynova",
+  "name": "pau-mastery",
   "version": "1.0.0",
-  "description": "Professional money blog with financial tools, SEO content and an educational market risk bot.",
+  "description": "Frontend for a PAU/EBAU revision platform with exam practice, mock tests and progress tracking.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "check": "node --check app.js && node --check server.js"
   },
   "keywords": [
-    "money",
-    "finance",
-    "investing",
-    "seo",
-    "calculators"
+    "pau",
+    "ebau",
+    "education",
+    "revision",
+    "exams"
   ],
   "author": "Bruno",
   "license": "MIT"

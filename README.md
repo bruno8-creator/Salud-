@@ -1,37 +1,37 @@
-# MoneyNova
+# PAU Mastery
 
-Professional money blog and tools platform focused on earning more, personal finance, investing basics and SEO-driven calculators.
+Frontend para una plataforma de repaso PAU/EBAU inspirada en productos tipo Revision Village o Revision Dojo.
 
-## Features
+## Incluye
 
-- Premium responsive financial/startup design.
-- Dark mode, sticky navbar, smooth reveal animations and search.
-- SEO routes for evergreen topics and calculators.
-- 50+ article ideas, featured articles, trending posts and sitemap.
-- Money tools: compound interest, savings goal, debt repayment, salary, side hustle profit and budget calculators.
-- Market risk bot that checks recent market data for a ticker and returns an educational risk snapshot.
-- AdSense and affiliate-ready content layout.
+- Landing premium enfocada en práctica de examen.
+- Dashboard de asignaturas y dominio.
+- Banco de preguntas filtrable por asignatura, tema y dificultad.
+- Soluciones paso a paso.
+- Generador visual de simulacros PAU.
+- Panel de progreso y plan de estudio diario.
+- Servidor Node mínimo para servir la app mientras preparamos backend real.
 
-## Run
+## Ejecutar
 
 ```bash
 npm start
 ```
 
-Open:
+Abre:
 
 ```text
 http://127.0.0.1:5173/
 ```
 
-## Endpoints
+## Siguiente backend
 
-- `GET /api/health`
-- `GET /api/content`
-- `GET /api/articles`
-- `GET /api/market-analysis?symbol=AAPL`
-- `GET /sitemap.xml`
+La estructura está lista para conectar APIs de:
 
-## Important
-
-MoneyNova is educational only. The market analyzer is not financial advice and does not recommend buying, selling or holding any investment.
+- Usuarios
+- Asignaturas
+- Preguntas
+- Soluciones
+- Intentos
+- Simulacros
+- Progreso
