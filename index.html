@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PAU Mastery | Practica la PAU con ejercicios tipo examen</title>
+    <title>Nota14 | Plataforma PAU estilo RevisionDojo</title>
     <meta
       name="description"
-      content="Plataforma de repaso PAU con ejercicios tipo examen, simulacros, soluciones paso a paso, progreso y rutas de estudio."
+      content="Nota14 es una plataforma PAU con banco de ejercicios por asignatura, tutor IA, exam mode, dashboard, flashcards y rutas SEO para preparar Selectividad."
     />
     <meta name="theme-color" content="#0b1020" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,14 +19,16 @@
   </head>
   <body>
     <header class="app-header">
-      <a class="brand" href="#inicio" aria-label="PAU Mastery inicio">
+      <a class="brand" href="#inicio" aria-label="Nota14 inicio">
         <img src="/assets/pau-mastery-logo.svg" alt="" />
-        <span>PAU Mastery</span>
+        <span>Nota14</span>
       </a>
       <nav class="nav-links" aria-label="Navegación principal">
         <a href="#dojo">Banco</a>
         <a href="#tutor">Tutor IA</a>
         <a href="#generador">Generador</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#flashcards">Flashcards</a>
         <a href="#lecciones">Lecciones</a>
         <a href="#asignaturas">Asignaturas</a>
       </nav>
@@ -36,15 +38,15 @@
     <main>
       <section class="hero" id="inicio">
         <div class="hero-content reveal">
-          <p class="eyebrow">Prepárate para la PAU sin perderte</p>
-          <h1>Practica como en el examen. Aprende como si tuvieras un tutor.</h1>
+          <p class="eyebrow">Nota14 · PAU española</p>
+          <h1>La plataforma para subir nota en la PAU.</h1>
           <p>
-            Banco de preguntas tipo PAU, soluciones paso a paso, simulacros por tiempo y un panel
-            de progreso para saber exactamente qué repasar antes del examen.
+            Banco de preguntas por asignatura, tutor IA, simulacros reales, dashboard, flashcards y
+            páginas SEO listas para convertir Nota14 en la referencia de preparación PAU en España.
           </p>
           <div class="hero-actions">
             <a class="primary-button" href="#dojo">Resolver ejercicios</a>
-            <a class="ghost-button" href="#simulacro">Crear simulacro</a>
+            <a class="ghost-button" href="#generador">Generar examen</a>
           </div>
         </div>
 
@@ -54,8 +56,8 @@
             <strong>01:28:00</strong>
           </div>
           <div class="question-preview">
-            <small>Matemáticas II · Álgebra</small>
-            <h2>Determina el rango de la matriz según el parámetro a.</h2>
+            <small>Exam Mode · Matemáticas II</small>
+            <h2>Responde, corrige y recibe una nota sobre 10.</h2>
             <div class="answer-lines">
               <span></span>
               <span></span>
@@ -81,7 +83,7 @@
         </div>
         <div class="reveal">
           <strong>∞</strong>
-          <span>simulacros combinables</span>
+          <span>exámenes corregibles</span>
         </div>
         <div class="reveal">
           <strong>100%</strong>
@@ -95,14 +97,14 @@
             <p class="eyebrow">Question bank</p>
             <h2>Banco de ejercicios PAU por asignatura.</h2>
             <p>
-              Elige una asignatura, filtra por tema y abre cualquier ejercicio con solución. Esta
-              es la vista principal tipo Revision Dojo.
+              Elige asignatura, filtra por tema, dificultad, comunidad autónoma y año. Esta es la
+              vista principal estilo RevisionDojo para practicar rápido.
             </p>
           </div>
           <div class="dojo-tabs" aria-label="Modos">
             <button class="active" type="button">Question Bank</button>
-            <button type="button">Mock Exams</button>
-            <button type="button">Mistakes</button>
+            <a href="#generador">Exam Mode</a>
+            <a href="#dashboard">Progreso</a>
           </div>
         </div>
 
@@ -129,6 +131,14 @@
                   <option value="Media">Media</option>
                   <option value="Difícil">Difícil</option>
                 </select>
+              </label>
+              <label>
+                Comunidad
+                <select id="dojoCommunity"></select>
+              </label>
+              <label>
+                Año
+                <select id="dojoYear"></select>
               </label>
             </div>
             <div class="dojo-topic-chips" id="dojoTopicChips"></div>
@@ -170,8 +180,8 @@
           <article class="ai-card reveal" id="generador">
             <h3>Generador de exámenes</h3>
             <p class="card-note">
-              Crea una prueba PAU completa sobre 10 puntos, con preguntas, apartados y hoja de
-              corrección.
+              Herramienta independiente: crea una hoja PAU sobre 10 puntos, escribe tus respuestas
+              y recibe una nota automática con feedback por pregunta.
             </p>
             <label>
               Asignatura
@@ -279,10 +289,10 @@
       <section class="mock-section" id="simulacro">
         <div class="mock-copy reveal">
           <p class="eyebrow">Modo examen</p>
-          <h2>Genera un simulacro PAU en segundos.</h2>
+          <h2>Exam Mode con temporizador y corrección.</h2>
           <p>
-            El backend crea un examen con portada, instrucciones, bloques, puntuación y hoja de
-            corrección. Después añadiremos guardado de intentos y corrección automática.
+            Crea una prueba real desde el JSON, arranca el temporizador, escribe tus respuestas y
+            corrige el intento desde el backend local.
           </p>
         </div>
         <div class="mock-builder reveal">
@@ -311,13 +321,13 @@
         </div>
       </section>
 
-      <section class="section-shell progress-section" id="progreso">
+      <section class="section-shell progress-section" id="dashboard">
         <div class="section-heading reveal">
-          <p class="eyebrow">Progreso</p>
+          <p class="eyebrow">Dashboard alumno</p>
           <h2>Un panel que te dice qué estudiar hoy.</h2>
           <p>
-            Vista de dominio por asignatura, puntos débiles, racha, objetivo semanal y calendario
-            de repaso para llegar al examen con menos caos.
+            Dominio por asignatura, temas fuertes, racha, horas estudiadas y plan de repaso para
+            llegar al examen con menos caos.
           </p>
         </div>
         <div class="progress-layout">
@@ -339,14 +349,58 @@
         </div>
       </section>
 
+      <section class="section-shell flashcard-section" id="flashcards">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Flashcards</p>
+          <h2>Memoriza teoría PAU con repetición espaciada.</h2>
+          <p>
+            Tarjetas generadas desde los temas reales del banco. Marca fácil, media o difícil para
+            simular el repaso espaciado del MVP.
+          </p>
+        </div>
+        <div class="flashcard-layout">
+          <article class="flashcard reveal" id="flashcardBox">
+            <span id="flashcardSubject">Nota14</span>
+            <h3 id="flashcardQuestion">Carga una tarjeta para empezar.</h3>
+            <p id="flashcardAnswer">Las flashcards aparecerán desde la base de ejercicios.</p>
+          </article>
+          <aside class="flashcard-controls reveal">
+            <button class="primary-button" id="newFlashcardButton" type="button">Nueva tarjeta</button>
+            <div class="flashcard-rating" aria-label="Valoración flashcard">
+              <button type="button" data-rating="Difícil">Difícil</button>
+              <button type="button" data-rating="Media">Media</button>
+              <button type="button" data-rating="Fácil">Fácil</button>
+            </div>
+            <p id="flashcardStatus">Racha de memoria: 0 tarjetas</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section-shell seo-section" id="seo">
+        <div class="section-heading reveal">
+          <p class="eyebrow">SEO programático</p>
+          <h2>Páginas listas para captar tráfico PAU.</h2>
+          <p>
+            Estructura preparada para crear rutas automáticas por asignatura, comunidad, notas de
+            corte y guías evergreen.
+          </p>
+        </div>
+        <div class="seo-grid">
+          <article><strong>Examen PAU Matemáticas Madrid</strong><span>/examen-pau-matematicas-madrid</span></article>
+          <article><strong>Nota corte Medicina UAM</strong><span>/nota-corte-medicina-uam</span></article>
+          <article><strong>Cómo subir nota PAU</strong><span>/como-subir-nota-pau</span></article>
+          <article><strong>PAU Física resuelta</strong><span>/pau-fisica-ejercicios-resueltos</span></article>
+        </div>
+      </section>
+
       <section class="assistant-section">
         <div class="assistant-card reveal">
           <div>
             <p class="eyebrow">Próximo paso</p>
-            <h2>Luego añadimos el backend y un tutor IA.</h2>
+            <h2>MVP lanzable: ahora toca conectar usuarios reales.</h2>
             <p>
-              La estructura ya está pensada para API: preguntas, usuarios, intentos, soluciones,
-              progreso y simulacros. Tú me ayudas con las reglas y yo lo conecto.
+              Ya hay backend local para ejercicios, tutor, lecciones, generador, simulacros y
+              corrección. El siguiente bloque sería login, pagos freemium/premium y persistencia.
             </p>
           </div>
           <a class="primary-button" href="#dojo">Probar una pregunta</a>

@@ -1,17 +1,19 @@
-# PAU Mastery
+# Nota14
 
-Frontend para una plataforma de repaso PAU/EBAU inspirada en productos tipo Revision Village o Revision Dojo.
+MVP de una plataforma de preparación PAU española inspirada en RevisionDojo, Duolingo y productos educativos premium.
 
 ## Incluye
 
-- Landing premium enfocada en práctica de examen.
-- Dashboard de asignaturas y dominio.
-- Banco de preguntas filtrable por asignatura, tema y dificultad.
-- Base local de 500 ejercicios originales tipo PAU desde `data/pau_exercises_500.json`.
-- Soluciones paso a paso.
-- Generador visual de simulacros PAU.
-- Panel de progreso y plan de estudio diario.
-- Servidor Node mínimo para servir la app mientras preparamos backend real.
+- Landing premium, rápida y responsive.
+- Banco de preguntas por asignatura con filtros por tema, dificultad, comunidad y año.
+- Base local JSON con 500 ejercicios PAU y normalización a las asignaturas objetivo.
+- Tutor IA local para pistas, pasos, errores típicos y ejercicio similar.
+- Generador de exámenes independiente con hoja de respuesta, temporizador y corrección sobre 10.
+- Exam Mode con simulacros desde la base de datos.
+- Dashboard alumno con dominio, racha, horas y plan de estudio.
+- Flashcards de repetición espaciada para teoría y métodos.
+- Bloque SEO programático para rutas como `/examen-pau-matematicas-madrid`.
+- Backend Node mínimo con APIs listas para sustituir por IA real y base de datos persistente.
 
 ## Ejecutar
 
@@ -25,40 +27,22 @@ Abre:
 http://127.0.0.1:5173/
 ```
 
-## Siguiente backend
+## Endpoints MVP
 
-La estructura está lista para conectar APIs de:
-
-- `GET /api/exercises`: ejercicios con filtros por asignatura, tema, dificultad, búsqueda y límite.
+- `GET /api/exercises`: ejercicios con filtros por asignatura, tema, dificultad, comunidad, año, búsqueda y límite.
 - `GET /api/subjects`: listado de asignaturas.
+- `GET /api/dashboard`: métricas demo de alumno.
+- `GET /api/flashcards`: tarjetas generadas desde el temario.
+- `GET /api/seo-pages`: páginas SEO programáticas.
 - `POST /api/mock-exam`: genera un examen PAU completo con bloques, instrucciones y hoja de corrección.
-- `POST /api/tutor`: tutor educativo para pedir pistas, pasos y errores típicos sobre un ejercicio.
+- `POST /api/grade-exam`: corrige respuestas escritas y devuelve nota, porcentaje y feedback.
+- `POST /api/tutor`: tutor educativo para pedir pistas, pasos y errores típicos.
 - `POST /api/lesson`: genera una lección por asignatura, tema y nivel.
 
-Módulos frontend añadidos:
+## Siguiente fase
 
-- Tutor IA: dudas generales por asignatura/tema y tutor contextual en cada ejercicio.
-- Generador de exámenes: selecciona asignatura, tema, dificultad y tipo de pregunta para crear ejercicios y soluciones.
-- Lecciones IA: explicación, ideas clave, ejemplo guiado y mini práctica.
-- Enriquecimiento de ejercicios: objetivo, método sugerido, pasos y notas de calidad para bases incompletas.
-
-Pendiente para una versión con usuarios:
-
-- Usuarios y sesiones
-- Guardado de intentos
-- Historial de simulacros
-- Progreso real por tema
-- Tutor IA conectado a modelo externo
-
-## Datos incluidos
-
-La carpeta `data/` contiene:
-
-- `pau_exercises_500.json`: 500 ejercicios originales tipo PAU.
-- `README_SCHEMA.md`: descripción del esquema de datos.
-
-El frontend carga los ejercicios desde:
-
-```text
-GET /api/exercises
-```
+- Login y perfiles de alumno.
+- Persistencia de intentos, errores y progreso.
+- Plan freemium/premium a 9.99 euros/mes.
+- Tutor IA conectado a un modelo real.
+- Panel admin para cargar exámenes oficiales y revisar calidad de ejercicios.

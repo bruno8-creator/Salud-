@@ -37,7 +37,8 @@ a {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -77,7 +78,8 @@ select {
 
 .nav-action,
 .primary-button,
-.ghost-button {
+.ghost-button,
+.ghost-dark-button {
   align-items: center;
   border-radius: 999px;
   cursor: pointer;
@@ -99,6 +101,12 @@ select {
 .ghost-button {
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
+}
+
+.ghost-dark-button {
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
 }
 
 .primary-button:hover,
@@ -342,18 +350,23 @@ h2 {
   padding: 5px;
 }
 
-.dojo-tabs button {
+.dojo-tabs button,
+.dojo-tabs a {
+  align-items: center;
   background: transparent;
   border: 0;
   border-radius: 999px;
   color: var(--muted);
   cursor: pointer;
+  display: inline-flex;
   font-weight: 850;
+  justify-content: center;
   min-height: 38px;
   padding: 0 14px;
 }
 
-.dojo-tabs button.active {
+.dojo-tabs button.active,
+.dojo-tabs a:hover {
   background: var(--ink);
   color: #fff;
 }
@@ -441,7 +454,7 @@ h2 {
 .bank-toolbar {
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(0, 1fr) 190px;
+  grid-template-columns: minmax(0, 1fr) repeat(3, minmax(130px, 0.34fr));
 }
 
 .dojo-topic-chips {
@@ -958,6 +971,27 @@ output {
   margin: 8px 0;
 }
 
+.exam-timer {
+  align-items: center;
+  background: #f8faff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.exam-timer strong {
+  color: var(--blue);
+  font-size: 1.5rem;
+}
+
+.exam-timer.is-finished {
+  border-color: rgba(255, 122, 89, 0.55);
+}
+
 .official-meta {
   background: #f8faff;
   border: 1px solid var(--line);
@@ -995,6 +1029,66 @@ output {
 .answer-key p {
   color: var(--muted);
   line-height: 1.65;
+}
+
+.answer-field {
+  color: var(--muted);
+  display: grid;
+  font-size: 0.86rem;
+  font-weight: 850;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.answer-field textarea {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  min-height: 150px;
+  padding: 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.grade-exam-button {
+  margin-top: 6px;
+  width: 100%;
+}
+
+.grade-output {
+  margin-top: 16px;
+}
+
+.grade-output:empty {
+  display: none;
+}
+
+.grade-summary,
+.grade-breakdown article {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.grade-summary strong {
+  color: var(--blue);
+  display: block;
+  font-size: 2rem;
+  margin: 6px 0;
+}
+
+.grade-summary p,
+.grade-breakdown p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.grade-breakdown {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .exam-paper.compact .exam-question strong {
@@ -1058,6 +1152,113 @@ meter {
   width: 100%;
 }
 
+.flashcard-section {
+  background: #fff;
+}
+
+.flashcard-layout {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  margin-top: 38px;
+}
+
+.flashcard,
+.flashcard-controls,
+.seo-grid article {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.flashcard {
+  display: grid;
+  min-height: 340px;
+  padding: clamp(28px, 5vw, 54px);
+}
+
+.flashcard span {
+  color: var(--blue);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.flashcard h3 {
+  align-self: center;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.05;
+  max-width: 920px;
+}
+
+.flashcard p {
+  align-self: end;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.flashcard-controls {
+  align-self: start;
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+}
+
+.flashcard-rating {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.flashcard-rating button {
+  background: #eef3ff;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #2444b8;
+  cursor: pointer;
+  font-weight: 900;
+  min-height: 44px;
+}
+
+.flashcard-controls p {
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.seo-section {
+  background: #f8faff;
+}
+
+.seo-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 34px;
+}
+
+.seo-grid article {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.seo-grid strong {
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.seo-grid span {
+  color: var(--blue);
+  font-size: 0.88rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
 .assistant-section {
   background: linear-gradient(135deg, #0b1020, #1f2f78);
 }
@@ -1096,7 +1297,8 @@ meter {
   .dojo-app,
   .practice-layout,
   .mock-section,
-  .progress-layout {
+  .progress-layout,
+  .flashcard-layout {
     grid-template-columns: 1fr;
   }
 
@@ -1111,10 +1313,11 @@ meter {
   }
 
   .bank-toolbar {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .subject-grid {
+  .subject-grid,
+  .seo-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1154,7 +1357,10 @@ meter {
 
   .stats-row,
   .subject-grid,
-  .score-strip {
+  .score-strip,
+  .bank-toolbar,
+  .seo-grid,
+  .flashcard-rating {
     grid-template-columns: 1fr;
   }
 

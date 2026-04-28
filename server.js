@@ -6,7 +6,8 @@ const PORT = Number(process.env.PORT) || 5173;
 const ROOT = __dirname;
 const DATABASE_PATH = path.join(ROOT, "data", "pau_exercises_500.json");
 const exerciseDatabase = loadExerciseDatabase();
-const exercises = exerciseDatabase.exercises || [];
+const exercises = buildNota14Exercises(exerciseDatabase.exercises || []);
+const seoPages = buildSeoPages().pages;
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
@@ -19,6 +20,18 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && url.pathname === "/api/subjects") {
     const subjects = [...new Set(exercises.map((exercise) => exercise.subject))];
     return sendJson(res, { subjects });
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/dashboard") {
+    return sendJson(res, buildDashboard());
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/flashcards") {
+    return sendJson(res, buildFlashcards());
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/seo-pages") {
+    return sendJson(res, buildSeoPages());
   }
 
   if (req.method === "POST" && url.pathname === "/api/mock-exam") {
@@ -36,21 +49,33 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, buildLesson(body));
   }
 
+  if (req.method === "POST" && url.pathname === "/api/grade-exam") {
+    const body = await readJson(req);
+    return sendJson(res, gradeExam(body));
+  }
+
   if (staticExtensions.includes(path.extname(url.pathname))) {
     return serveStatic(url.pathname, res);
+  }
+
+  const seoPage = seoPages.find((page) => page.slug === url.pathname);
+  if (seoPage) {
+    return sendHtml(res, renderSeoPage(seoPage));
   }
 
   return serveStatic("/index.html", res);
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`PAU Mastery running at http://127.0.0.1:${PORT}`);
+  console.log(`Nota14 running at http://127.0.0.1:${PORT}`);
 });
 
 function filterExercises(url) {
   const subject = url.searchParams.get("subject");
   const topic = url.searchParams.get("topic");
   const difficulty = url.searchParams.get("difficulty");
+  const community = url.searchParams.get("community");
+  const year = url.searchParams.get("year");
   const search = (url.searchParams.get("search") || "").toLowerCase();
   const limit = Number(url.searchParams.get("limit")) || exercises.length;
 
@@ -58,17 +83,82 @@ function filterExercises(url) {
     const subjectMatch = !subject || subject === "all" || exercise.subject === subject;
     const topicMatch = !topic || topic === "all" || exercise.topic === topic;
     const difficultyMatch = !difficulty || difficulty === "all" || normalizeDifficulty(exercise.difficulty) === difficulty;
+    const communityMatch = !community || community === "all" || exercise.autonomous_community === community;
+    const yearMatch = !year || year === "all" || exercise.year_reference === year;
     const searchMatch = !search || `${exercise.question} ${exercise.topic} ${exercise.id}`.toLowerCase().includes(search);
-    return subjectMatch && topicMatch && difficultyMatch && searchMatch;
+    return subjectMatch && topicMatch && difficultyMatch && communityMatch && yearMatch && searchMatch;
   });
 
   return {
     metadata: {
       ...exerciseDatabase.metadata,
+      name: "Nota14 PAU MVP exercise database",
+      total_exercises: exercises.length,
+      subjects: [...new Set(exercises.map((exercise) => exercise.subject))],
       returned_exercises: Math.min(filtered.length, limit)
     },
     exercises: filtered.slice(0, limit).map(enrichExercise)
   };
+}
+
+function buildNota14Exercises(rawExercises) {
+  const canonical = rawExercises
+    .filter((exercise) => exercise.subject !== "Historia de la Filosofía")
+    .map((exercise) => ({
+      ...exercise,
+      subject: canonicalSubject(exercise.subject)
+    }));
+
+  const hasGeography = canonical.some((exercise) => exercise.subject === "Geografía");
+  return hasGeography ? canonical : canonical.concat(generateGeographyExercises());
+}
+
+function canonicalSubject(subject) {
+  const map = {
+    "Matemáticas CCSS II": "Matemáticas CCSS",
+    "Lengua Castellana y Literatura II": "Lengua",
+    "Historia de España": "Historia España",
+    "Inglés II": "Inglés",
+    "Empresa y Diseño de Modelos de Negocio": "Economía"
+  };
+  return map[subject] || subject;
+}
+
+function generateGeographyExercises() {
+  const topics = [
+    "Relieve español",
+    "Climas de España",
+    "Hidrografía",
+    "Población",
+    "Ciudad y urbanismo",
+    "Sector primario",
+    "Industria",
+    "Servicios y turismo",
+    "Desequilibrios territoriales",
+    "Comentario de mapa"
+  ];
+  const communities = ["Madrid", "Cataluña", "Andalucía", "Comunidad Valenciana", "Galicia"];
+  const years = ["2022-style", "2023-style", "2024-style", "2025-style", "2026-style"];
+  const difficulties = ["baja", "media", "alta"];
+
+  return Array.from({ length: 50 }, (_, index) => {
+    const topic = topics[index % topics.length];
+    const number = String(index + 1).padStart(3, "0");
+    return {
+      id: `PAU-GEOGRAFIA-${number}`,
+      subject: "Geografía",
+      topic,
+      difficulty: difficulties[index % difficulties.length],
+      exam_type: "PAU / Selectividad",
+      autonomous_community: communities[index % communities.length],
+      year_reference: years[index % years.length],
+      question: `Analiza un caso tipo PAU sobre ${topic}. Identifica los conceptos clave, interpreta la información geográfica y redacta una conclusión territorial razonada.`,
+      solution: `Define ${topic}, localiza el fenómeno en España, explica dos causas, comenta dos consecuencias y cierra con una valoración territorial usando vocabulario geográfico preciso.`,
+      marks: 2,
+      source_type: "original_generated_from_official_style",
+      tags: ["PAU", "Selectividad", topic, "Geografía"]
+    };
+  });
 }
 
 function buildMockExam(input = {}) {
@@ -138,6 +228,11 @@ function buildTutorReply(input = {}) {
     || exercises[0];
   const userQuestion = String(input.message || "").trim();
   const steps = splitSolution(exercise.solution);
+  const similarExercise = exercises.find((item) =>
+    item.id !== exercise.id
+    && item.subject === exercise.subject
+    && item.topic === exercise.topic
+  ) || exercises.find((item) => item.id !== exercise.id && item.subject === exercise.subject);
   const hints = [
     `Empieza identificando el tema: ${exercise.topic}.`,
     `Subraya qué te piden exactamente en el enunciado antes de calcular.`,
@@ -156,9 +251,27 @@ function buildTutorReply(input = {}) {
     hints,
     steps,
     commonMistakes: buildCommonMistakes(exercise),
+    detectedError: buildDetectedError(exercise, userQuestion),
+    similarExercise: similarExercise ? {
+      id: similarExercise.id,
+      topic: similarExercise.topic,
+      question: similarExercise.question
+    } : null,
     finalCheck: `Cuando termines, comprueba que tu respuesta responde al enunciado y que optaría a ${exercise.marks || 2} puntos.`,
     disclaimer: "Tutor educativo generado por reglas locales. Después podemos conectarlo a un modelo IA real."
   };
+}
+
+function buildDetectedError(exercise, userQuestion) {
+  const topic = String(exercise.topic || "").toLowerCase();
+  const message = userQuestion.toLowerCase();
+  if (/no entiendo|atasc|perdid|mal|fall/i.test(message)) {
+    return "Probable error: estás intentando calcular antes de fijar datos, objetivo y método.";
+  }
+  if (topic.includes("deriv")) return "Error típico a vigilar: confundir el punto crítico con máximo o mínimo sin clasificarlo.";
+  if (topic.includes("integr")) return "Error típico a vigilar: plantear la integral sin comprobar qué curva queda arriba.";
+  if (topic.includes("comentario")) return "Error típico a vigilar: resumir el texto pero no justificar intención, estructura y tesis.";
+  return "Error probable: falta justificar el procedimiento con una conclusión que responda exactamente al enunciado.";
 }
 
 function buildLesson(input = {}) {
@@ -188,6 +301,159 @@ function buildLesson(input = {}) {
     },
     generatedBy: "local-ai-ready-engine"
   };
+}
+
+function buildDashboard() {
+  const subjectNames = [...new Set(exercises.map((exercise) => exercise.subject))];
+  return {
+    student: "Demo Nota14",
+    globalMastery: 76,
+    streakDays: 6,
+    studiedHours: 18.5,
+    masteredTopics: 24,
+    subjects: subjectNames.map((subject, index) => {
+      const subjectExercises = exercises.filter((exercise) => exercise.subject === subject);
+      return {
+        subject,
+        exercises: subjectExercises.length,
+        mastery: 58 + ((index * 7) % 34),
+        weakTopic: subjectExercises[index % subjectExercises.length]?.topic || "Repaso general"
+      };
+    })
+  };
+}
+
+function buildFlashcards() {
+  const topicMap = new Map();
+  exercises.forEach((exercise) => {
+    const key = `${exercise.subject}-${exercise.topic}`;
+    if (!topicMap.has(key)) {
+      topicMap.set(key, {
+        id: slugify(key),
+        subject: exercise.subject,
+        topic: exercise.topic,
+        front: `¿Cómo se empieza un ejercicio de ${exercise.topic}?`,
+        back: buildMethod(exercise),
+        interval: "1 día",
+        ease: 2.5
+      });
+    }
+  });
+  return { flashcards: [...topicMap.values()].slice(0, 120) };
+}
+
+function buildSeoPages() {
+  const subjectPages = [...new Set(exercises.map((exercise) => exercise.subject))].map((subject) => ({
+    title: `Examen PAU ${subject} Madrid`,
+    slug: `/examen-pau-${slugify(subject)}-madrid`,
+    description: `Ejercicios resueltos de ${subject} para preparar la PAU en Madrid.`
+  }));
+
+  return {
+    pages: [
+      ...subjectPages,
+      {
+        title: "Examen PAU Matemáticas Madrid",
+        slug: "/examen-pau-matematicas-madrid",
+        description: "Practica Matemáticas para la PAU de Madrid con ejercicios tipo examen, soluciones y simulacros."
+      },
+      {
+        title: "Nota corte Medicina UAM",
+        slug: "/nota-corte-medicina-uam",
+        description: "Guía evergreen sobre nota de corte, ponderaciones y estrategia PAU."
+      },
+      {
+        title: "Cómo subir nota PAU",
+        slug: "/como-subir-nota-pau",
+        description: "Plan de estudio, errores frecuentes y simulacros para subir nota."
+      },
+      {
+        title: "PAU Física ejercicios resueltos",
+        slug: "/pau-fisica-ejercicios-resueltos",
+        description: "Ejercicios resueltos de Física PAU por tema con explicación paso a paso y errores frecuentes."
+      }
+    ]
+  };
+}
+
+function gradeExam(input = {}) {
+  const exam = input.exam || {};
+  const answers = input.answers || {};
+  const answerKey = exam.answerKey || [];
+  const maxScore = Number(exam.totalMarks || 10);
+
+  const graded = answerKey.map((item) => {
+    const rawAnswer = String(answers[item.id] || "").trim();
+    const maxMarks = Number(item.marks || 0);
+    const score = scoreAnswer(rawAnswer, item.solution, maxMarks);
+    return {
+      id: item.id,
+      number: item.number,
+      topic: item.topic,
+      maxMarks,
+      score,
+      feedback: buildAnswerFeedback(rawAnswer, item.solution, score, maxMarks)
+    };
+  });
+
+  const total = Number(graded.reduce((sum, item) => sum + item.score, 0).toFixed(2));
+  return {
+    examId: exam.id,
+    score: total,
+    maxScore,
+    percentage: maxScore ? Math.round((total / maxScore) * 100) : 0,
+    gradeLabel: gradeLabel(total, maxScore),
+    graded,
+    summary: buildGradeSummary(total, maxScore)
+  };
+}
+
+function scoreAnswer(answer, solution, maxMarks) {
+  if (!answer) return 0;
+  const answerWords = tokenSet(answer);
+  const solutionWords = tokenSet(solution);
+  const overlap = [...answerWords].filter((word) => solutionWords.has(word)).length;
+  const overlapRatio = solutionWords.size ? overlap / Math.min(solutionWords.size, 28) : 0;
+  const lengthRatio = Math.min(answer.length / 240, 1);
+  const structureBonus = /porque|por tanto|entonces|finalmente|conclusi[oó]n|paso|datos|f[oó]rmula/i.test(answer) ? 0.12 : 0;
+  const raw = Math.min(0.18 + overlapRatio * 0.55 + lengthRatio * 0.25 + structureBonus, 1);
+  return Number((maxMarks * raw).toFixed(2));
+}
+
+function tokenSet(value) {
+  const stop = new Set(["para", "como", "este", "esta", "pero", "porque", "sobre", "entre", "donde", "cuando", "desde", "hasta", "todo", "toda", "valor", "resultado"]);
+  return new Set(
+    String(value)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9ñ]+/g, " ")
+      .split(/\s+/)
+      .filter((word) => word.length > 3 && !stop.has(word))
+  );
+}
+
+function buildAnswerFeedback(answer, solution, score, maxMarks) {
+  if (!answer) return "Sin respuesta: intenta al menos plantear datos, método y conclusión.";
+  const ratio = maxMarks ? score / maxMarks : 0;
+  if (ratio >= 0.78) return "Muy bien: la respuesta contiene buena parte de los elementos esperados. Revisa precisión y presentación.";
+  if (ratio >= 0.48) return "Respuesta parcial: hay ideas correctas, pero faltan pasos, justificación o cierre.";
+  return `Insuficiente todavía: compara con la solución esperada y añade procedimiento. Solución guía: ${solution}`;
+}
+
+function gradeLabel(score, maxScore) {
+  const ratio = maxScore ? score / maxScore : 0;
+  if (ratio >= 0.85) return "Excelente";
+  if (ratio >= 0.7) return "Notable";
+  if (ratio >= 0.5) return "Aprobado";
+  return "Necesita repaso";
+}
+
+function buildGradeSummary(score, maxScore) {
+  const ratio = maxScore ? score / maxScore : 0;
+  if (ratio >= 0.7) return "Vas bien. Tu prioridad ahora es mejorar precisión y evitar perder puntos por justificación.";
+  if (ratio >= 0.5) return "Estás cerca. Refuerza procedimientos y escribe conclusiones más claras.";
+  return "Conviene repasar el tema y repetir el examen tras estudiar la hoja de corrección.";
 }
 
 function generateAiExercises({ subject, topic, difficulty, questionType, amount }) {
@@ -448,6 +714,39 @@ function readJson(req) {
 function sendJson(res, data, status = 200) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(data));
+}
+
+function sendHtml(res, html, status = 200) {
+  res.writeHead(status, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(html);
+}
+
+function renderSeoPage(page) {
+  return `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${page.title} | Nota14</title>
+    <meta name="description" content="${page.description}" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="seo-landing">
+      <section class="hero">
+        <div class="hero-content is-visible">
+          <p class="eyebrow">Nota14 · PAU española</p>
+          <h1>${page.title}</h1>
+          <p>${page.description}</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="/#dojo">Practicar ejercicios</a>
+            <a class="ghost-button" href="/#simulacro">Crear simulacro</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>`;
 }
 
 function getContentType(filePath) {

@@ -28,6 +28,8 @@ const exerciseList = document.querySelector("#exerciseList");
 const exerciseViewer = document.querySelector("#exerciseViewer");
 const exerciseSearch = document.querySelector("#exerciseSearch");
 const dojoDifficulty = document.querySelector("#dojoDifficulty");
+const dojoCommunity = document.querySelector("#dojoCommunity");
+const dojoYear = document.querySelector("#dojoYear");
 const subjectFilter = document.querySelector("#subjectFilter");
 const topicFilter = document.querySelector("#topicFilter");
 const difficultyFilter = document.querySelector("#difficultyFilter");
@@ -55,6 +57,11 @@ const lessonTopic = document.querySelector("#lessonTopic");
 const lessonLevel = document.querySelector("#lessonLevel");
 const lessonButton = document.querySelector("#lessonButton");
 const lessonOutput = document.querySelector("#lessonOutput");
+const flashcardSubject = document.querySelector("#flashcardSubject");
+const flashcardQuestion = document.querySelector("#flashcardQuestion");
+const flashcardAnswer = document.querySelector("#flashcardAnswer");
+const newFlashcardButton = document.querySelector("#newFlashcardButton");
+const flashcardStatus = document.querySelector("#flashcardStatus");
 let lastTutorExerciseId = "";
 
 let subjects = [];
@@ -63,6 +70,10 @@ let activeQuestionIndex = 0;
 let activeSubjectName = "";
 let activeDojoTopic = "all";
 let activeExerciseId = "";
+let currentGeneratedExam = null;
+let activeFlashcardIndex = 0;
+let flashcardReviews = 0;
+let runningTimer = null;
 
 init();
 
@@ -75,8 +86,10 @@ async function init() {
   renderDojo();
   hydrateFilters();
   hydrateAiControls();
+  hydrateDojoMetaFilters();
   renderQuestion();
   renderProgress();
+  renderFlashcard();
   bindEvents();
 }
 
@@ -294,13 +307,17 @@ function renderTopicChips() {
 function getDojoExercises() {
   const query = exerciseSearch.value.trim().toLowerCase();
   const difficulty = dojoDifficulty.value;
+  const community = dojoCommunity.value;
+  const year = dojoYear.value;
 
   return questions.filter((question) => {
     const subjectMatch = question.subject === activeSubjectName;
     const topicMatch = activeDojoTopic === "all" || question.topic === activeDojoTopic;
     const difficultyMatch = difficulty === "all" || question.difficultyLabel === difficulty;
+    const communityMatch = community === "all" || question.community === community;
+    const yearMatch = year === "all" || question.year === year;
     const searchMatch = !query || `${question.topic} ${question.question} ${question.id}`.toLowerCase().includes(query);
-    return subjectMatch && topicMatch && difficultyMatch && searchMatch;
+    return subjectMatch && topicMatch && difficultyMatch && communityMatch && yearMatch && searchMatch;
   });
 }
 
@@ -410,6 +427,13 @@ function hydrateAiControls() {
   hydrateTopicSelect(lessonSubject, lessonTopic);
 }
 
+function hydrateDojoMetaFilters() {
+  const communities = [...new Set(questions.map((question) => question.community))].sort();
+  const years = [...new Set(questions.map((question) => question.year))].sort();
+  dojoCommunity.innerHTML = `<option value="all">Todas</option>${communities.map((item) => `<option value="${item}">${item}</option>`).join("")}`;
+  dojoYear.innerHTML = `<option value="all">Todos</option>${years.map((item) => `<option value="${item}">${item}</option>`).join("")}`;
+}
+
 function hydrateTopicSelect(subjectSelect, topicSelect) {
   const topicSet = new Set(questions.filter((question) => question.subject === subjectSelect.value).map((question) => question.topic));
   topicSelect.innerHTML = [...topicSet].sort().map((topic) => `<option value="${topic}">${topic}</option>`).join("");
@@ -448,12 +472,26 @@ function bindEvents() {
   buildMockButton.addEventListener("click", buildMockExam);
   exerciseSearch.addEventListener("input", renderExerciseList);
   dojoDifficulty.addEventListener("change", renderExerciseList);
+  dojoCommunity.addEventListener("change", renderExerciseList);
+  dojoYear.addEventListener("change", renderExerciseList);
   tutorSubject.addEventListener("change", () => hydrateTopicSelect(tutorSubject, tutorTopic));
   aiExamSubject.addEventListener("change", () => hydrateTopicSelect(aiExamSubject, aiExamTopic));
   lessonSubject.addEventListener("change", () => hydrateTopicSelect(lessonSubject, lessonTopic));
   generalTutorButton.addEventListener("click", askGeneralTutor);
   aiExamButton.addEventListener("click", buildAiExam);
   lessonButton.addEventListener("click", buildLesson);
+  newFlashcardButton.addEventListener("click", () => {
+    activeFlashcardIndex += 1;
+    renderFlashcard();
+  });
+  document.querySelectorAll("[data-rating]").forEach((button) => {
+    button.addEventListener("click", () => {
+      flashcardReviews += 1;
+      flashcardStatus.textContent = `Racha de memoria: ${flashcardReviews} tarjetas · última: ${button.dataset.rating}`;
+      activeFlashcardIndex += 1;
+      renderFlashcard();
+    });
+  });
 }
 
 function getFilteredQuestions() {
@@ -541,6 +579,7 @@ async function buildMockExam() {
   mockResult.innerHTML = `
     ${renderExamOutput(exam)}
   `;
+  wireExamForm(mockResult, exam);
 }
 
 async function askTutor(exercise) {
@@ -586,6 +625,8 @@ async function buildAiExam() {
   });
 
   aiExamOutput.innerHTML = exam ? renderExamOutput(exam) : `<strong>No se pudo generar el examen.</strong>`;
+  currentGeneratedExam = exam;
+  wireExamForm(aiExamOutput, exam);
 }
 
 async function buildLesson() {
@@ -626,6 +667,11 @@ function renderTutorOutput(tutor) {
     <ol>${tutor.steps.map((step) => `<li>${step}</li>`).join("")}</ol>
     <h5>Errores típicos</h5>
     <ul>${tutor.commonMistakes.map((mistake) => `<li>${mistake}</li>`).join("")}</ul>
+    ${tutor.detectedError ? `<h5>Error detectado</h5><p>${tutor.detectedError}</p>` : ""}
+    ${tutor.similarExercise ? `
+      <h5>Ejercicio similar</h5>
+      <p><strong>${tutor.similarExercise.topic}:</strong> ${tutor.similarExercise.question}</p>
+    ` : ""}
     <p>${tutor.finalCheck}</p>
   `;
 }
@@ -637,6 +683,10 @@ function renderExamOutput(exam) {
         <span>${exam.header.examType} · ${exam.id}</span>
         <h3>${exam.title}</h3>
         <p>${exam.header.course} · ${exam.duration} minutos · ${exam.totalMarks.toFixed(1)} puntos</p>
+        <div class="exam-timer">
+          <strong data-exam-timer>${formatTimer(exam.duration * 60)}</strong>
+          <button class="ghost-dark-button" type="button" data-start-timer>Iniciar temporizador</button>
+        </div>
         <div class="official-meta">
           <strong>Material:</strong> ${exam.header.allowedMaterial}
         </div>
@@ -655,6 +705,10 @@ function renderExamOutput(exam) {
             <article class="exam-question">
               <strong>${sectionIndex + 1}.${index + 1} · ${question.topic} · ${question.marks} pts</strong>
               <p>${question.statement}</p>
+              <label class="answer-field">
+                Tu respuesta
+                <textarea data-answer-id="${question.id}" rows="6" placeholder="Escribe aquí tu desarrollo, cálculos y conclusión..."></textarea>
+              </label>
             </article>
           `).join("")}
         </section>
@@ -669,6 +723,74 @@ function renderExamOutput(exam) {
           </article>
         `).join("")}
       </details>
+      <button class="primary-button grade-exam-button" type="button" data-grade-exam>Corregir y dar nota</button>
+      <div class="grade-output" data-grade-output></div>
+    </div>
+  `;
+}
+
+function wireExamForm(container, exam) {
+  const gradeButton = container.querySelector("[data-grade-exam]");
+  const output = container.querySelector("[data-grade-output]");
+  const timerButton = container.querySelector("[data-start-timer]");
+  const timerLabel = container.querySelector("[data-exam-timer]");
+  if (!gradeButton || !output || !exam) return;
+
+  if (timerButton && timerLabel) {
+    timerButton.addEventListener("click", () => startExamTimer(timerLabel, exam.duration * 60, timerButton));
+  }
+
+  gradeButton.addEventListener("click", async () => {
+    const answers = {};
+    container.querySelectorAll("[data-answer-id]").forEach((textarea) => {
+      answers[textarea.dataset.answerId] = textarea.value;
+    });
+
+    output.innerHTML = `<strong>Corrigiendo examen...</strong>`;
+    const grade = await postJson("/api/grade-exam", { exam, answers });
+    output.innerHTML = grade ? renderGradeOutput(grade) : `<strong>No se pudo corregir el examen.</strong>`;
+  });
+}
+
+function startExamTimer(label, seconds, button) {
+  clearInterval(runningTimer);
+  let remaining = seconds;
+  button.disabled = true;
+  button.textContent = "Temporizador activo";
+  label.textContent = formatTimer(remaining);
+  runningTimer = setInterval(() => {
+    remaining -= 1;
+    label.textContent = formatTimer(Math.max(remaining, 0));
+    if (remaining <= 0) {
+      clearInterval(runningTimer);
+      button.textContent = "Tiempo terminado";
+      label.closest(".exam-timer")?.classList.add("is-finished");
+    }
+  }, 1000);
+}
+
+function formatTimer(totalSeconds) {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+}
+
+function renderGradeOutput(grade) {
+  return `
+    <div class="grade-summary">
+      <span>Nota</span>
+      <strong>${grade.score.toFixed(2)} / ${grade.maxScore.toFixed(2)}</strong>
+      <p>${grade.gradeLabel} · ${grade.percentage}%</p>
+      <p>${grade.summary}</p>
+    </div>
+    <div class="grade-breakdown">
+      ${grade.graded.map((item) => `
+        <article>
+          <strong>Pregunta ${item.number}: ${item.score.toFixed(2)} / ${item.maxMarks.toFixed(2)}</strong>
+          <p>${item.feedback}</p>
+        </article>
+      `).join("")}
     </div>
   `;
 }
@@ -702,6 +824,14 @@ function renderProgress() {
       `
     )
     .join("");
+}
+
+function renderFlashcard() {
+  if (!questions.length) return;
+  const question = questions[activeFlashcardIndex % questions.length];
+  flashcardSubject.textContent = `${question.subject} · ${question.topic}`;
+  flashcardQuestion.textContent = `¿Cómo se empieza un ejercicio de ${question.topic}?`;
+  flashcardAnswer.textContent = question.method || solutionSteps(question.solution)[0] || question.solution;
 }
 
 function difficultyLabel(value) {

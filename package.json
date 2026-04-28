@@ -1,7 +1,7 @@
 {
-  "name": "pau-mastery",
+  "name": "nota14",
   "version": "1.0.0",
-  "description": "Frontend for a PAU/EBAU revision platform with exam practice, mock tests and progress tracking.",
+  "description": "MVP for Nota14, a PAU/EBAU revision platform with question bank, AI tutor, exam mode, dashboard and flashcards.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
