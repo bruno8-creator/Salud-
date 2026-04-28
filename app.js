@@ -21,6 +21,13 @@ const fallbackExercises = [
 
 const subjectGrid = document.querySelector("#subjectGrid");
 const subjectDetail = document.querySelector("#subjectDetail");
+const dojoSubjectList = document.querySelector("#dojoSubjectList");
+const dojoSubjectCount = document.querySelector("#dojoSubjectCount");
+const dojoTopicChips = document.querySelector("#dojoTopicChips");
+const exerciseList = document.querySelector("#exerciseList");
+const exerciseViewer = document.querySelector("#exerciseViewer");
+const exerciseSearch = document.querySelector("#exerciseSearch");
+const dojoDifficulty = document.querySelector("#dojoDifficulty");
 const subjectFilter = document.querySelector("#subjectFilter");
 const topicFilter = document.querySelector("#topicFilter");
 const difficultyFilter = document.querySelector("#difficultyFilter");
@@ -37,6 +44,8 @@ let subjects = [];
 let questions = [];
 let activeQuestionIndex = 0;
 let activeSubjectName = "";
+let activeDojoTopic = "all";
+let activeExerciseId = "";
 
 init();
 
@@ -46,6 +55,7 @@ async function init() {
   renderSubjects();
   activeSubjectName = subjects[0]?.name || "";
   renderSubjectDetail(activeSubjectName);
+  renderDojo();
   hydrateFilters();
   renderQuestion();
   renderProgress();
@@ -147,11 +157,14 @@ function renderSubjects() {
     card.addEventListener("click", () => {
       activeSubjectName = card.dataset.subject;
       renderSubjectDetail(activeSubjectName);
+      activeDojoTopic = "all";
+      activeExerciseId = "";
+      renderDojo();
       subjectFilter.value = activeSubjectName;
       hydrateTopics();
       activeQuestionIndex = 0;
       renderQuestion();
-      document.querySelector("#practica").scrollIntoView({ behavior: "smooth", block: "start" });
+      document.querySelector("#dojo").scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 
@@ -211,6 +224,137 @@ function renderSubjectDetail(subjectName) {
   });
 }
 
+function renderDojo() {
+  dojoSubjectCount.textContent = subjects.length;
+  dojoSubjectList.innerHTML = subjects
+    .map((subject) => `
+      <button class="${subject.name === activeSubjectName ? "active" : ""}" data-subject="${subject.name}" type="button">
+        <span style="--accent:${subject.accent}"></span>
+        <strong>${subject.name}</strong>
+        <small>${subject.count}</small>
+      </button>
+    `)
+    .join("");
+
+  dojoSubjectList.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeSubjectName = button.dataset.subject;
+      activeDojoTopic = "all";
+      activeExerciseId = "";
+      renderDojo();
+      renderSubjectDetail(activeSubjectName);
+    });
+  });
+
+  renderTopicChips();
+  renderExerciseList();
+}
+
+function renderTopicChips() {
+  const topics = [...new Set(questions.filter((question) => question.subject === activeSubjectName).map((question) => question.topic))].sort();
+
+  dojoTopicChips.innerHTML = [
+    `<button class="${activeDojoTopic === "all" ? "active" : ""}" data-topic="all" type="button">Todos</button>`,
+    ...topics.map((topic) => `<button class="${topic === activeDojoTopic ? "active" : ""}" data-topic="${topic}" type="button">${topic}</button>`)
+  ].join("");
+
+  dojoTopicChips.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeDojoTopic = button.dataset.topic;
+      activeExerciseId = "";
+      renderTopicChips();
+      renderExerciseList();
+    });
+  });
+}
+
+function getDojoExercises() {
+  const query = exerciseSearch.value.trim().toLowerCase();
+  const difficulty = dojoDifficulty.value;
+
+  return questions.filter((question) => {
+    const subjectMatch = question.subject === activeSubjectName;
+    const topicMatch = activeDojoTopic === "all" || question.topic === activeDojoTopic;
+    const difficultyMatch = difficulty === "all" || question.difficultyLabel === difficulty;
+    const searchMatch = !query || `${question.topic} ${question.question} ${question.id}`.toLowerCase().includes(query);
+    return subjectMatch && topicMatch && difficultyMatch && searchMatch;
+  });
+}
+
+function renderExerciseList() {
+  const exercises = getDojoExercises();
+  const selected = exercises.find((exercise) => exercise.id === activeExerciseId) || exercises[0];
+  activeExerciseId = selected?.id || "";
+
+  exerciseList.innerHTML = exercises.length
+    ? exercises
+      .map((exercise) => `
+        <button class="exercise-row ${exercise.id === activeExerciseId ? "active" : ""}" data-id="${exercise.id}" type="button">
+          <div>
+            <strong>${exercise.topic}</strong>
+            <p>${exercise.question}</p>
+          </div>
+          <span>${exercise.difficultyLabel}</span>
+        </button>
+      `)
+      .join("")
+    : `<div class="empty-state"><h3>No hay ejercicios.</h3><p>Cambia el tema, búsqueda o dificultad.</p></div>`;
+
+  exerciseList.querySelectorAll(".exercise-row").forEach((row) => {
+    row.addEventListener("click", () => {
+      activeExerciseId = row.dataset.id;
+      renderExerciseList();
+    });
+  });
+
+  renderExerciseViewer(selected);
+}
+
+function renderExerciseViewer(exercise) {
+  if (!exercise) {
+    exerciseViewer.innerHTML = `
+      <div class="empty-state">
+        <h3>Sin ejercicio seleccionado</h3>
+        <p>Selecciona un ejercicio del banco.</p>
+      </div>
+    `;
+    return;
+  }
+
+  exerciseViewer.innerHTML = `
+    <div class="viewer-meta">
+      <span>${exercise.difficultyLabel}</span>
+      <span>${exercise.marks} pts</span>
+    </div>
+    <h3>${exercise.topic}</h3>
+    <p class="viewer-question">${exercise.question}</p>
+    <div class="viewer-context">
+      <span>${exercise.community}</span>
+      <span>${exercise.year}</span>
+      <span>${exercise.id}</span>
+    </div>
+    <details open>
+      <summary>Solución guiada</summary>
+      <ol>
+        ${solutionSteps(exercise.solution).map((step) => `<li>${step}</li>`).join("")}
+      </ol>
+      <p>${exercise.solution}</p>
+    </details>
+    <button class="primary-button viewer-practice" type="button" id="sendToPractice">Practicar en grande</button>
+  `;
+
+  exerciseViewer.querySelector("#sendToPractice").addEventListener("click", () => {
+    subjectFilter.value = exercise.subject;
+    hydrateTopics();
+    topicFilter.value = exercise.topic;
+    difficultyFilter.value = exercise.difficultyLabel;
+    const pool = getFilteredQuestions();
+    activeQuestionIndex = Math.max(0, pool.findIndex((item) => item.id === exercise.id));
+    renderQuestion();
+    document.querySelector("#practica").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
 function hydrateFilters() {
   const options = subjects.map((subject) => `<option value="${subject.name}">${subject.name}</option>`).join("");
   subjectFilter.innerHTML = `<option value="all">Todas</option>${options}`;
@@ -249,6 +393,8 @@ function bindEvents() {
     mockOutput.textContent = `${mockQuestions.value} ejercicios`;
   });
   buildMockButton.addEventListener("click", buildMockExam);
+  exerciseSearch.addEventListener("input", renderExerciseList);
+  dojoDifficulty.addEventListener("change", renderExerciseList);
 }
 
 function getFilteredQuestions() {
